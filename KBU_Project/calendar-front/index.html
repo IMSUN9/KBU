@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Event Calendar Widget</title>
+
+
+
+      <link rel="stylesheet" href="css/style.css">
+</head>
+
+<!-- 일정 등록 모달 -->
+<div id="eventModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h2>Add Event</h2>
+        <label for="eventTitle">Title:</label>
+        <input type="text" id="eventTitle" placeholder="Event title" />
+        <label for="eventType">Type:</label>
+        <select id="eventType">
+            <option value="work">Work</option>
+            <option value="sports">Sports</option>
+            <option value="kids">Kids</option>
+            <option value="other">Other</option>
+        </select>
+        <button onclick="saveEvent()">Save</button>
+    </div>
+</div>
+
+<body>
+  <div id="calendar"></div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+
+    <script src="js/index.js"></script>
+
+</body>
+</html>
