@@ -302,7 +302,7 @@
     modal.innerHTML = `
       <div class="add-box">
         <h3>일정을 추가하세요</h3>
-        <input type="text" placeholder="제목을 입력하세요" class="add-title"/>
+        <input type="text" placeholder="일정을 입력하세요" class="add-title"/>
         <div class="type-buttons">
           <button data-type="Work">Work</button>
           <button data-type="Sports">Sports</button>
