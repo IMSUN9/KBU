@@ -312,7 +312,8 @@ body {
 .entry.green:after { background: rgba(153, 198, 109, 1); }
 .entry.yellow:after { background: rgba(249, 233, 0, 1); }
 
-.add-event-button {
+.add-event-button
+{
   display: inline-block; /* 버튼을 텍스트 줄 위로 안 올라가게 */
   margin: 10px 0 3px 10px; /* 위 오른쪽 아래 왼쪽 */
   /* margin: 8px 0 8px 10px 설명
@@ -333,6 +334,19 @@ body {
   background-color: #777;
 }
 
+.delete-event-button
+{
+  margin-left: 8px; /* 이벤트 이름이랑 약간 띄우기 */
+  background: transparent;
+  color: #666;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.delete-event-button:hover {
+  color: red;
+}
 
 /* Animations are cool!  */
 @-webkit-keyframes moveFromTopFade {
@@ -424,3 +438,122 @@ body {
 @keyframes fadeOutShink  {
   to { opacity: 0; padding: 0px; height: 0px; }
 }
+
+@keyframes fadeOutRemove {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(20px); }
+}
+
+.fade-out {
+  animation: fadeOutRemove 0.4s ease forwards;
+}
+
+.confirm-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirm-box {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  color: #333; /* ← 글씨를 진회색으로 지정 (혹은 black) */
+  font-size: 16px;
+  text-align: center;
+  animation: fadeInUp 0.3s ease;
+}
+
+.modal-buttons {
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  margin: 0 10px;
+  padding: 7px 15px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-yes {
+  background: #ff4d4d;
+  color: white;
+}
+.btn-no {
+  background: #ccc;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.add-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.add-box {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  width: 300px;
+
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.add-box h3 {
+  margin-bottom: 10px;
+  font-size: 25px; /* 폰트 크기 키우기 */
+  color: #333;     /* 글자색 진하게 */
+  font-weight: bold; /* 굵게 */
+}
+
+
+.add-box input.add-title {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.type-buttons {
+  margin-bottom: 15px;
+}
+
+.type-buttons button {
+  margin: 2px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  background: #ddd;
+  cursor: pointer;
+}
+
+.type-buttons button.selected {
+  background: #555;
+  color: white;
+}
+
