@@ -126,8 +126,23 @@ body {
  color: rgba(255, 255, 255, .3);
 }
 
-.day.today {
-  color: rgba(156, 202, 235, 1);
+.day.today .day-number {
+  color: #ff4d4d;       /* 빨간색 */
+  font-weight: bold;    /* 굵게 */
+  transform: scale(1.05); /* 살짝 키움 */
+  display: inline-block;  /* transform 적용하려면 필요 */
+}
+
+.day:hover .day-number {
+  color: #ffc107;           /* 노란색 강조 */
+  transform: scale(1.2);    /* 약간 확대 */
+  font-weight: bold;        /* 조금 더 두껍게 */
+  transition: all 0.2s ease;
+}
+
+.day.selected .day-number {
+  color: #f39c12; /* 예쁜 주황색 */
+  font-weight: bold;
 }
 
 .day-name {
@@ -278,6 +293,14 @@ body {
   display: inline-block;
   padding: 0 0 0 7px;
 }
+
+/* 📍 기존 event 스타일 밑에 추가해줘 */
+.event:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* 마우스 올리면 살짝 밝아지게 */
+  border-radius: 8px; /* 모서리 살짝 둥글게 */
+  transition: background-color 0.3s; /* 부드럽게 */
+}
+
 
 .legend {
   position: absolute;
@@ -530,7 +553,6 @@ body {
   color: #333;     /* 글자색 진하게 */
   font-weight: bold; /* 굵게 */
 }
-
 
 .add-box input.add-title {
   width: 100%;

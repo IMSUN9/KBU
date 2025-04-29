@@ -121,7 +121,15 @@
     return classes.join(' ');
   };
 
-  Calendar.prototype.openDay = function (el) {
+  Calendar.prototype.openDay = function (el)
+  {
+    // 이전 선택 제거
+    document.querySelectorAll('.day.selected').forEach(el => {
+      el.classList.remove('selected');
+    });
+    // 현재 선택된 날짜에 selected 클래스 추가
+    el.classList.add('selected');
+
     const dateStr = el.getAttribute('data-date');
     const day = moment(dateStr, 'YYYY-MM-DD');
 
