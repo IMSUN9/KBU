@@ -127,7 +127,7 @@ body {
 }
 
 .day.today .day-number {
-  color: #ff4d4d;       /* 빨간색 */
+  color: #4dabf7;       /* 빨간색 */
   font-weight: bold;    /* 굵게 */
   transform: scale(1.05); /* 살짝 키움 */
   display: inline-block;  /* transform 적용하려면 필요 */
