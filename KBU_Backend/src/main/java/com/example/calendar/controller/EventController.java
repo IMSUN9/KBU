@@ -1,50 +1,50 @@
 package com.example.calendar.controller;
 
-// Event 관련 요청을 처리하는 컨트롤러
-
 import com.example.calendar.model.Event;
+import com.example.calendar.repository.EventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@RestController // 컨트롤러 + JSON 반환 (@ResponseBody 생략 가능) // JSON 데이터를 반환하는 컨트롤러
-@RequestMapping("/api/events") // 공통 URL 경로 // 이 컨트롤러는 /api/events로 시작하는 요청만 처리
-@CrossOrigin(origins = "*") // 모든 출처에서 접근 허용 (테스트용)
+@RestController // JSON 형식의 데이터를 반환하는 REST 컨트롤러임을 명시
+@RequestMapping("/api/events") // 이 컨트롤러는 /api/events 로 시작하는 URL을 처리함
+@CrossOrigin(origins = "*") // 프론트엔드와 연동 시 CORS 문제를 해결해줌
+public class EventController {
 
-public class EventController
-{
-    // 메모리 안에만 임시 저장하는 리스트 (DB 연결 전까지는 이걸로 저장)
-    private List<Event> eventList = new ArrayList<>();
+    // ✅ DB에 접근하기 위한 Repository (JPA가 자동으로 구현체를 생성해줌)
+    @Autowired
+    private EventRepository eventRepository;
 
-    // 일정 추가 API (POST /api/events) // POST 요청 (일정 추가)
+    // ✅ 일정 추가 API (POST 요청: /api/events)
     @PostMapping
-    private Event addEvent(@RequestBody Event event) // @RequestBody = 요청 바디에 들어온 JSON을 Event 객체로 변환
-    {
-        eventList.add(event);
-        return event; // 추가한 이벤트를 그대로 응답
+    public Event addEvent(@RequestBody Event event) {
+        // 전달받은 이벤트 객체를 DB에 저장하고 저장된 결과를 반환
+        return eventRepository.save(event);
     }
 
-    @DeleteMapping // DELETE 요청을 처리하는 API라는 뜻
-    // @RequestParam : 요청 URL에 붙은 title, type, date를 각각 받아온다
+    // ✅ 전체 일정 조회 API (GET 요청: /api/events)
+    @GetMapping
+    public List<Event> getAllEvents() {
+        // DB에 저장된 모든 이벤트를 조회해서 리스트로 반환
+        return eventRepository.findAll();
+    }
+
+    // ✅ 일정 삭제 API (DELETE 요청: /api/events?title=...&type=...&date=...)
+    @DeleteMapping
     public boolean deleteEvent(@RequestParam String title,
                                @RequestParam String type,
-                               @RequestParam String date)
-    {
-        // 리스트에서 조건에 맞는 이벤트를 찾아 삭제
-        // eventList.removeIf(조건) : 리스트 안에 이 조건을 만족하는 이벤트가 있으면 삭제해줘
-        // 삭제 성공하면 true, 실패하면 false 리턴!
-        return eventList.removeIf(e ->
-                e.getTitle().equals(title) &&
-                e.getType().equals(type) &&
-                        e.getDate().equals(date)
-        );
-    }
-
-    // 전체 일정 조회 API (GET /api/events) // GET 요청 (일정 조회)
-    @GetMapping
-    public List<Event> getAllEvents()
-    {
-        return eventList;
+                               @RequestParam String date) {
+        // 조건을 만족하는 모든 이벤트를 찾아 리스트로 가져옴
+        List<Event> events = eventRepository.findAll();
+        for (Event e : events) {
+            if (e.getTitle().equals(title) &&
+                    e.getType().equals(type) &&
+                    e.getDate().equals(date)) {
+                eventRepository.delete(e); // 해당 이벤트 삭제
+                return true; // 삭제 성공
+            }
+        }
+        return false; // 일치하는 이벤트가 없으면 실패
     }
 }
