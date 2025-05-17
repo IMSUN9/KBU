@@ -178,14 +178,27 @@
     })
       .then(res => res.json())
       .then(addedEvent => {
+        // 👉 내부 이벤트 배열에도 반영
         this.events.push({
           eventName: addedEvent.title,
           calendar: addedEvent.type,
           color: getColor(addedEvent.type),
           date: moment(addedEvent.date, 'YYYY-MM-DD')
         });
+
+        // 👉 하단 상세 영역에 다시 그리기
         this.renderEvents(this.events.filter(ev => ev.date.isSame(day, 'day')), details);
-      })
+
+        // ✅ 날짜 셀의 색 네모 즉시 갱신
+        const targetDayEl = document.querySelector(`.day[data-date="${day.format('YYYY-MM-DD')}"]`);
+        if (targetDayEl) {
+            const eventsEl = targetDayEl.querySelector('.day-events');
+             if (eventsEl) {
+                  eventsEl.innerHTML = ''; // 기존 박스 초기화
+                  this.drawEvents(day, eventsEl); // 새로 그리기
+                }
+              }
+            })
       .catch(err => {
         console.error('Error adding event:', err);
         alert('일정 추가 실패');
@@ -236,7 +249,19 @@
         if (response.ok) {
           const index = this.events.indexOf(ev);
           if (index > -1) this.events.splice(index, 1);
+
+          // ✅ 상세 박스 안에 이벤트 리스트 새로 렌더링
           this.renderEvents(this.events.filter(e => e.date.isSame(ev.date, 'day')), ele);
+
+          // ✅ 💡 달력 셀 안의 네모도 새로 그리기
+          const dayCell = document.querySelector(`.day[data-date="${ev.date.format('YYYY-MM-DD')}"]`);
+          if (dayCell) {
+            const eventContainer = dayCell.querySelector('.day-events');
+            if (eventContainer) {
+              eventContainer.innerHTML = ''; // 기존 네모 삭제
+              this.drawEvents(ev.date, eventContainer); // 새로운 네모 다시 그림
+            }
+          }
         } else {
           throw new Error('삭제 실패');
         }
@@ -378,7 +403,28 @@
   }
 
   // 캘린더 실행
-  const data = [];
-  const calendar = new Calendar('#calendar', data);
+  // const data = [];
+  // const calendar = new Calendar('#calendar', data);
+
+  // ✅ 서버에서 일정 데이터를 불러온 후, Calendar를 실행하는 부분
+  fetch('http://localhost:8080/api/events')
+    .then(res => res.json())
+    .then(eventList => {
+      // 백엔드에서 받은 데이터를 Calendar가 이해할 수 있도록 변환
+      const events = eventList.map(ev => ({
+        eventName: ev.title,                     // 일정 제목
+        calendar: ev.type,                       // 일정 유형
+        color: getColor(ev.type),                // 색상 결정 함수로 색 지정
+        date: moment(ev.date, 'YYYY-MM-DD')      // 날짜 문자열 → moment 객체로 변환
+      }));
+
+      // ✅ 이 시점에서 Calendar를 실행
+      new Calendar('#calendar', events);
+    })
+    .catch(err => {
+      console.error('서버로부터 이벤트 불러오기 실패:', err);
+      alert('이벤트를 불러오는 데 실패했습니다.');
+    });
+
 
 }();
