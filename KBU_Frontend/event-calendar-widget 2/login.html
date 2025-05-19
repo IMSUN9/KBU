@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>로그인</title>
     <link rel="stylesheet" href="css/login.css" />
 </head>
 <body>
+
 <div class="login-container">
     <h2>로그인</h2>
     <input type="text" id="username" placeholder="아이디 입력" />
     <input type="password" id="password" placeholder="비밀번호 입력" />
     <button onclick="login()">로그인</button>
-    <div id="login-message"></div>
+    <p id="login-message"></p>
+    <p>계정이 없으신가요? <a href="signup.html">회원가입</a></p>
 </div>
 
 <script src="js/login.js"></script>

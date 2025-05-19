@@ -1,32 +1,45 @@
-document.getElementById('loginForm').addEventListener('submit', function (e) {
-  e.preventDefault();
+// js/login.js
 
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
+function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const messageEl = document.getElementById("login-message");
 
-  const user = { username, password };
+  // 기본 유효성 검사
+  if (!username || !password) {
+    messageEl.textContent = "아이디와 비밀번호를 모두 입력하세요.";
+    messageEl.className = "error";
+    return;
+  }
 
-  fetch('http://localhost:8080/api/auth/login', {
-    method: 'POST',
+  fetch("http://localhost:8080/api/auth/login", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify(user)
+    body: JSON.stringify({ username, password })
   })
-    .then(res => res.text())
-    .then(tokenOrMessage => {
-      const msg = document.getElementById('message');
-
-      if (tokenOrMessage.startsWith('ey')) { // JWT 토큰은 보통 'ey...'로 시작
-        localStorage.setItem('token', tokenOrMessage); // ✅ 토큰 저장
-        window.location.href = 'index.html';           // ✅ 캘린더 화면으로 이동
-      } else {
-        msg.style.color = 'red';
-        msg.textContent = tokenOrMessage; // 실패 메시지 출력
+    .then(res => {
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+        }
+        throw new Error("서버 오류가 발생했습니다.");
       }
+      return res.text(); // 서버에서 토큰을 문자열로 반환
+    })
+    .then(token => {
+      localStorage.setItem("token", token); // 토큰 저장
+      messageEl.textContent = "로그인 성공! 잠시 후 이동합니다...";
+      messageEl.className = "success";
+
+      // 1초 후 메인 페이지로 이동
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1000);
     })
     .catch(err => {
-      console.error('로그인 오류:', err);
-      document.getElementById('message').textContent = '오류가 발생했습니다.';
+      messageEl.textContent = err.message;
+      messageEl.className = "error";
     });
-});
+}
