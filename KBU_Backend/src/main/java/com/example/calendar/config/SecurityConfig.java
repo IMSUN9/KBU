@@ -1,5 +1,8 @@
+// 📁 com.example.calendar.config.SecurityConfig.java
+
 package com.example.calendar.config;
 
+import jakarta.servlet.Filter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,29 +15,35 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
+    // ✅ JwtAuthenticationFilter를 등록
+    @Bean
+    public Filter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
+    }
+
+    // ✅ AuthenticationManager를 빈으로 등록
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    // ✅ Spring Security 필터 체인 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+                .csrf(csrf -> csrf.disable()) // ❌ CSRF 비활성화 (JWT는 세션 X)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()  // ✅ 로그인 허용
-                        .anyRequest().authenticated()                 // 그 외에는 인증 필요
+                        .requestMatchers("/api/auth/**").permitAll() // ✅ 로그인/회원가입은 허용
+                        .anyRequest().authenticated()                // 🔒 나머지는 인증 필요
                 )
+                .formLogin(form -> form.disable())              // ❌ 기본 로그인 폼 제거
+                .httpBasic(httpBasic -> httpBasic.disable())    // ❌ HTTP Basic도 끔
                 .sessionManagement(sess -> sess
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT 기반이라 세션 사용 안 함
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // ✅ JWT는 무상태(stateless)
                 )
-                .formLogin(form -> form.disable())   // 폼 로그인 비활성화
-                .httpBasic(httpBasic -> httpBasic.disable()); // HTTP Basic 인증도 비활성화
-
-        // 🔐 커스텀 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
-        http.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                // ✅ 우리가 만든 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 끼워 넣음
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    // AuthenticationManager가 필요할 경우를 대비한 빈 등록
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
 }

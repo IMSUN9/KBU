@@ -1,7 +1,11 @@
 package com.example.calendar.controller;
 
 import com.example.calendar.model.Event;
+import com.example.calendar.model.User;
 import com.example.calendar.repository.EventRepository;
+import com.example.calendar.repository.UserRepository;
+import com.example.calendar.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,37 +16,55 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class EventController {
 
-    // ✅ DB와 연결된 JPA 인터페이스 자동 주입
     @Autowired
     private EventRepository eventRepository;
 
-    // ✅ 일정 추가 (DB에 저장됨)
-    @PostMapping
-    public Event addEvent(@RequestBody Event event) {
-        return eventRepository.save(event);
+    @Autowired
+    private UserRepository userRepository;
+
+    // ✅ JWT 토큰에서 사용자 정보를 추출하는 메서드
+    private User getUserFromRequest(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // "Bearer " 제거
+            String username = JwtUtil.getUsernameFromToken(token);
+            return userRepository.findByUsername(username);
+        }
+        return null;
     }
 
-    // ✅ 일정 삭제 (DB에서 삭제)
+    // ✅ 일정 추가 (로그인한 사용자 기준으로 저장)
+    @PostMapping
+    public Event addEvent(@RequestBody Event event, HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        if (user != null) {
+            event.setUser(user); // 사용자 정보 주입
+            return eventRepository.save(event);
+        }
+        return null; // 인증 실패 시 null 반환
+    }
+
+    // ✅ 일정 삭제 (로그인한 사용자의 일정을 삭제)
     @DeleteMapping
     public boolean deleteEvent(@RequestParam String title,
                                @RequestParam String type,
-                               @RequestParam String date) {
-        List<Event> events = eventRepository.findAll();
-
-        for (Event e : events) {
-            if (e.getTitle().equals(title) &&
-                    e.getType().equals(type) &&
-                    e.getDate().equals(date)) {
-                eventRepository.delete(e);
-                return true;
-            }
+                               @RequestParam String date,
+                               HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        if (user != null) {
+            eventRepository.deleteByUserAndTitleAndTypeAndDate(user, title, type, date);
+            return true;
         }
         return false;
     }
 
-    // ✅ 전체 일정 조회
+    // ✅ 전체 일정 조회 (로그인한 사용자 기준)
     @GetMapping
-    public List<Event> getAllEvents() {
-        return eventRepository.findAll();
+    public List<Event> getAllEvents(HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        if (user != null) {
+            return eventRepository.findByUser(user);
+        }
+        return List.of(); // 빈 리스트 반환
     }
 }

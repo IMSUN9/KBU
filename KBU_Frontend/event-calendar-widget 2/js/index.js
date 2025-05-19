@@ -1,3 +1,21 @@
+// 🔐 fetch 실패 시 토큰 만료 처리
+function handleFetchError(err) {
+  console.error('요청 실패:', err);
+  if (err.message.includes('401') || err.message.includes('403')) {
+    alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  } else {
+    alert('서버 통신 중 오류가 발생했습니다.');
+  }
+}
+
+// 🔐 저장된 JWT 토큰을 가져오는 함수
+function getToken() {
+  return localStorage.getItem('token');
+}
+
+// 🔐 캘린더 실행 함수 시작
 !function () {
   const today = moment();
 
@@ -121,18 +139,12 @@
     return classes.join(' ');
   };
 
-  Calendar.prototype.openDay = function (el)
-  {
-    // 이전 선택 제거
-    document.querySelectorAll('.day.selected').forEach(el => {
-      el.classList.remove('selected');
-    });
-    // 현재 선택된 날짜에 selected 클래스 추가
+  Calendar.prototype.openDay = function (el) {
+    document.querySelectorAll('.day.selected').forEach(el => el.classList.remove('selected'));
     el.classList.add('selected');
 
     const dateStr = el.getAttribute('data-date');
     const day = moment(dateStr, 'YYYY-MM-DD');
-
     let details, arrow;
     const currentOpened = document.querySelector('.details');
 
@@ -146,14 +158,13 @@
       }
       details = createElement('div', 'details in');
       details.setAttribute('data-date', dateStr);
-
       arrow = createElement('div', 'arrow');
       details.appendChild(arrow);
 
       const addBtn = createElement('button', 'add-event-button', 'Add Event');
       addBtn.addEventListener('click', () => {
         showAddModal({
-          onSubmit: (eventName, eventType) => this.addEvent(eventName, eventType, day, details),
+          onSubmit: (title, type) => this.addEvent(title, type, day, details),
           onCancel: () => {}
         });
       });
@@ -173,12 +184,14 @@
 
     fetch('http://localhost:8080/api/events', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getToken()
+      },
       body: JSON.stringify(newEvent)
     })
       .then(res => res.json())
       .then(addedEvent => {
-        // 👉 내부 이벤트 배열에도 반영
         this.events.push({
           eventName: addedEvent.title,
           calendar: addedEvent.type,
@@ -186,23 +199,18 @@
           date: moment(addedEvent.date, 'YYYY-MM-DD')
         });
 
-        // 👉 하단 상세 영역에 다시 그리기
         this.renderEvents(this.events.filter(ev => ev.date.isSame(day, 'day')), details);
 
-        // ✅ 날짜 셀의 색 네모 즉시 갱신
         const targetDayEl = document.querySelector(`.day[data-date="${day.format('YYYY-MM-DD')}"]`);
         if (targetDayEl) {
-            const eventsEl = targetDayEl.querySelector('.day-events');
-             if (eventsEl) {
-                  eventsEl.innerHTML = ''; // 기존 박스 초기화
-                  this.drawEvents(day, eventsEl); // 새로 그리기
-                }
-              }
-            })
-      .catch(err => {
-        console.error('Error adding event:', err);
-        alert('일정 추가 실패');
-      });
+          const eventsEl = targetDayEl.querySelector('.day-events');
+          if (eventsEl) {
+            eventsEl.innerHTML = '';
+            this.drawEvents(day, eventsEl);
+          }
+        }
+      })
+      .catch(handleFetchError);
   };
 
   Calendar.prototype.renderEvents = function (events, ele) {
@@ -243,38 +251,32 @@
 
   Calendar.prototype.deleteEvent = function (ev, ele) {
     fetch(`http://localhost:8080/api/events?title=${encodeURIComponent(ev.eventName)}&type=${encodeURIComponent(ev.calendar)}&date=${ev.date.format('YYYY-MM-DD')}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + getToken()
+      }
     })
-      .then(response => {
-        if (response.ok) {
-          const index = this.events.indexOf(ev);
-          if (index > -1) this.events.splice(index, 1);
+      .then(res => {
+        if (!res.ok) throw new Error('삭제 실패');
+        const index = this.events.indexOf(ev);
+        if (index > -1) this.events.splice(index, 1);
+        this.renderEvents(this.events.filter(e => e.date.isSame(ev.date, 'day')), ele);
 
-          // ✅ 상세 박스 안에 이벤트 리스트 새로 렌더링
-          this.renderEvents(this.events.filter(e => e.date.isSame(ev.date, 'day')), ele);
-
-          // ✅ 💡 달력 셀 안의 네모도 새로 그리기
-          const dayCell = document.querySelector(`.day[data-date="${ev.date.format('YYYY-MM-DD')}"]`);
-          if (dayCell) {
-            const eventContainer = dayCell.querySelector('.day-events');
-            if (eventContainer) {
-              eventContainer.innerHTML = ''; // 기존 네모 삭제
-              this.drawEvents(ev.date, eventContainer); // 새로운 네모 다시 그림
-            }
+        const dayCell = document.querySelector(`.day[data-date="${ev.date.format('YYYY-MM-DD')}"]`);
+        if (dayCell) {
+          const container = dayCell.querySelector('.day-events');
+          if (container) {
+            container.innerHTML = '';
+            this.drawEvents(ev.date, container);
           }
-        } else {
-          throw new Error('삭제 실패');
         }
       })
-      .catch(err => {
-        console.error('삭제 중 오류:', err);
-        alert('삭제 실패');
-      });
+      .catch(handleFetchError);
   };
 
   Calendar.prototype.drawLegend = function () {
     const legend = createElement('div', 'legend');
-    const base = [
+    const types = [
       { name: 'Work', color: 'orange' },
       { name: 'Sports', color: 'blue' },
       { name: 'Friend', color: 'yellow' },
@@ -282,7 +284,7 @@
     ];
     const seen = new Set();
 
-    base.forEach(e => addLegendEntry(legend, e, seen));
+    types.forEach(t => addLegendEntry(legend, t, seen));
     this.events.forEach(e => addLegendEntry(legend, { name: e.calendar, color: e.color }, seen));
 
     this.el.appendChild(legend);
@@ -300,11 +302,11 @@
     this.draw();
   };
 
-  function createElement(tagName, className, innerText) {
-    const ele = document.createElement(tagName);
-    if (className) ele.className = className;
-    if (innerText) ele.textContent = innerText;
-    return ele;
+  function createElement(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text) el.textContent = text;
+    return el;
   }
 
   function getColor(type) {
@@ -325,106 +327,27 @@
     }
   }
 
-  // 모달 함수 (추가/삭제 모달)
-  function showAddModal({ onSubmit, onCancel }) {
-    const existing = document.querySelector('.add-modal');
-    if (existing) existing.remove();
-
-    const modal = document.createElement('div');
-    modal.className = 'add-modal';
-    modal.innerHTML = `
-      <div class="add-box">
-        <h3>일정을 추가하세요</h3>
-        <input type="text" placeholder="일정을 입력하세요" class="add-title"/>
-        <div class="type-buttons">
-          <button data-type="Work">Work</button>
-          <button data-type="Sports">Sports</button>
-          <button data-type="Friend">Friend</button>
-          <button data-type="Other">Other</button>
-        </div>
-        <div class="modal-buttons">
-          <button class="btn-no">취소</button>
-          <button class="btn-yes">추가</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-
-    let selectedType = null;
-    modal.querySelectorAll('.type-buttons button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        selectedType = btn.dataset.type;
-        modal.querySelectorAll('.type-buttons button').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-      });
-    });
-
-    modal.querySelector('.btn-yes').addEventListener('click', () => {
-      const title = modal.querySelector('.add-title').value.trim();
-      if (title && selectedType) {
-        onSubmit(title, selectedType);
-        modal.remove();
-      } else {
-        alert('제목과 유형을 선택하세요!');
-      }
-    });
-
-    modal.querySelector('.btn-no').addEventListener('click', () => {
-      onCancel();
-      modal.remove();
-    });
-  }
-
-  function showConfirmModal({ eventName, onConfirm, onCancel }) {
-    const existing = document.querySelector('.confirm-modal');
-    if (existing) existing.remove();
-
-    const modal = document.createElement('div');
-    modal.className = 'confirm-modal';
-    modal.innerHTML = `
-      <div class="confirm-box">
-        <p><strong>「${eventName}」</strong><br>일정을 삭제하시겠습니까?</p>
-        <div class="modal-buttons">
-          <button class="btn-yes">확인</button>
-          <button class="btn-no">취소</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-
-    modal.querySelector('.btn-yes').addEventListener('click', () => {
-      onConfirm();
-      modal.remove();
-    });
-    modal.querySelector('.btn-no').addEventListener('click', () => {
-      onCancel();
-      modal.remove();
-    });
-  }
-
-  // 캘린더 실행
-  // const data = [];
-  // const calendar = new Calendar('#calendar', data);
-
-  // ✅ 서버에서 일정 데이터를 불러온 후, Calendar를 실행하는 부분
-  fetch('http://localhost:8080/api/events')
-    .then(res => res.json())
+  // ✅ 캘린더 실행 - JWT 토큰 포함하여 일정 조회
+  fetch('http://localhost:8080/api/events', {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + getToken(),
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('401 Unauthorized');
+      return res.json();
+    })
     .then(eventList => {
-      // 백엔드에서 받은 데이터를 Calendar가 이해할 수 있도록 변환
       const events = eventList.map(ev => ({
-        eventName: ev.title,                     // 일정 제목
-        calendar: ev.type,                       // 일정 유형
-        color: getColor(ev.type),                // 색상 결정 함수로 색 지정
-        date: moment(ev.date, 'YYYY-MM-DD')      // 날짜 문자열 → moment 객체로 변환
+        eventName: ev.title,
+        calendar: ev.type,
+        color: getColor(ev.type),
+        date: moment(ev.date, 'YYYY-MM-DD')
       }));
-
-      // ✅ 이 시점에서 Calendar를 실행
       new Calendar('#calendar', events);
     })
-    .catch(err => {
-      console.error('서버로부터 이벤트 불러오기 실패:', err);
-      alert('이벤트를 불러오는 데 실패했습니다.');
-    });
-
+    .catch(handleFetchError);
 
 }();
