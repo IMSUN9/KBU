@@ -33,9 +33,9 @@ function login() {
       messageEl.textContent = "로그인 성공! 잠시 후 이동합니다...";
       messageEl.className = "success";
 
-      // 1초 후 메인 페이지로 이동
+      // ✅ 1초 후 메인 페이지로 이동 (경로 수정됨)
       setTimeout(() => {
-        window.location.href = "index.html";
+        window.location.href = "/event-calendar-app/index.html";
       }, 1000);
     })
     .catch(err => {

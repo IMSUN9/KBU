@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     logoutBtn.addEventListener('click', function () {
       localStorage.removeItem('token'); // 🔐 JWT 토큰 삭제
       alert('로그아웃 되었습니다.');
-      window.location.href = 'login.html'; // 🔄 로그인 페이지로 이동
+      window.location.href = '/event-calendar-app/login.html'; // 🔄 경로 수정됨
     });
   } else {
     console.warn('❗ logout-btn 버튼을 찾을 수 없습니다.');

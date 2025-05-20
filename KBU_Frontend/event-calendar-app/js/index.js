@@ -4,7 +4,7 @@ function handleFetchError(err) {
   if (err.message.includes('401') || err.message.includes('403')) {
     alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
     localStorage.removeItem('token');
-    window.location.href = '/login.html';
+    window.location.href = './login.html';
   } else {
     alert('서버 통신 중 오류가 발생했습니다.');
   }

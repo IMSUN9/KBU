@@ -1,48 +1,65 @@
-// 📁 com.example.calendar.config.SecurityConfig.java
-
 package com.example.calendar.config;
 
+import com.example.calendar.jwt.JwtAuthenticationFilter;
 import jakarta.servlet.Filter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
 
-    // ✅ JwtAuthenticationFilter를 등록
+    // ✅ JWT 필터 빈 등록
     @Bean
     public Filter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
 
-    // ✅ AuthenticationManager를 빈으로 등록
+    // ✅ AuthenticationManager 빈 등록
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    // ✅ Spring Security 필터 체인 설정
+    // ✅ CORS 설정 (★ 중요: allowCredentials + 명시적 origin 조합)
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("http://localhost:63342")); // ★ 와일드카드 제거
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true); // ★ 반드시 true로 설정
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    // ✅ Spring Security 필터 체인
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // ❌ CSRF 비활성화 (JWT는 세션 X)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 최신 방식으로 CORS 등록
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // ✅ 로그인/회원가입은 허용
-                        .anyRequest().authenticated()                // 🔒 나머지는 인증 필요
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable())              // ❌ 기본 로그인 폼 제거
-                .httpBasic(httpBasic -> httpBasic.disable())    // ❌ HTTP Basic도 끔
-                .sessionManagement(sess -> sess
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // ✅ JWT는 무상태(stateless)
-                )
-                // ✅ 우리가 만든 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 끼워 넣음
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable);
 
         return http.build();
     }

@@ -13,24 +13,27 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // 비밀번호 암호화 인코더
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    // ✅ 비밀번호 암호화를 위한 인코더
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // ✅ 회원가입 처리
     public boolean registerUser(User user) {
+        // 중복 사용자 확인
         if (userRepository.findByUsername(user.getUsername()) != null) {
             System.out.println("[회원가입 실패] 이미 존재하는 사용자: " + user.getUsername());
             return false;
         }
 
+        // 비밀번호 암호화 후 저장
         String encryptedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encryptedPassword);
         userRepository.save(user);
+
         System.out.println("[회원가입 성공] 사용자 등록 완료: " + user.getUsername());
         return true;
     }
 
-    // ✅ 로그인 처리 - 토큰 발급
+    // ✅ 로그인 처리 - JWT 토큰 발급
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username);
 
@@ -45,6 +48,7 @@ public class UserService {
             return null;
         }
 
+        // 로그인 성공 → 토큰 발급
         System.out.println("[로그인 성공] JWT 토큰 발급: " + username);
         return JwtUtil.createToken(username);
     }
