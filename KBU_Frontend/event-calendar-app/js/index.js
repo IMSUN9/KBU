@@ -15,6 +15,44 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
+function showAddModal({ onSubmit, onCancel }) {
+    const modal = document.createElement('div');
+    modal.className = 'add-modal';
+
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h3>새 일정 추가</h3>
+        <input type="text" id="event-title" placeholder="일정 제목" />
+        <select id="event-type">
+          <option value="Work">Work</option>
+          <option value="Sports">Sports</option>
+          <option value="Friend">Friend</option>
+          <option value="Other">Other</option>
+        </select>
+        <div class="modal-actions">
+          <button id="submit-event">추가</button>
+          <button id="cancel-event">취소</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('submit-event').onclick = () => {
+      const title = document.getElementById('event-title').value.trim();
+      const type = document.getElementById('event-type').value;
+      if (title) {
+        onSubmit(title, type);
+        modal.remove();
+      }
+    };
+
+    document.getElementById('cancel-event').onclick = () => {
+      onCancel();
+      modal.remove();
+    };
+  }
+
 // 🔐 캘린더 실행 함수 시작
 !function () {
   const today = moment();
@@ -327,7 +365,6 @@ function getToken() {
     }
   }
 
-  // ✅ 캘린더 실행 - JWT 토큰 포함하여 일정 조회
   fetch('http://localhost:8080/api/events', {
     method: 'GET',
     headers: {

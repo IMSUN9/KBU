@@ -1,17 +1,16 @@
-// js/login.js
-
 function login() {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
   const messageEl = document.getElementById("login-message");
 
-  // 기본 유효성 검사
+  // 유효성 검사
   if (!username || !password) {
     messageEl.textContent = "아이디와 비밀번호를 모두 입력하세요.";
     messageEl.className = "error";
     return;
   }
 
+  // 로그인 요청
   fetch("http://localhost:8080/api/auth/login", {
     method: "POST",
     headers: {
@@ -26,20 +25,21 @@ function login() {
         }
         throw new Error("서버 오류가 발생했습니다.");
       }
-      return res.text(); // 서버에서 토큰을 문자열로 반환
+      return res.text(); // 서버에서 받은 JWT 토큰 문자열
     })
     .then(token => {
-      localStorage.setItem("token", token); // 토큰 저장
+      // 🔐 토큰 저장
+      localStorage.setItem("token", token);
       messageEl.textContent = "로그인 성공! 잠시 후 이동합니다...";
       messageEl.className = "success";
 
-      // ✅ 1초 후 메인 페이지로 이동 (경로 수정됨)
+      // ✅ index.html로 이동 (정적 루트 기준)
       setTimeout(() => {
-        window.location.href = "/event-calendar-app/index.html";
+        window.location.href = "/index.html";
       }, 1000);
     })
     .catch(err => {
-      messageEl.textContent = err.message;
+      messageEl.textContent = "❌ 로그인 실패: " + err.message;
       messageEl.className = "error";
     });
 }

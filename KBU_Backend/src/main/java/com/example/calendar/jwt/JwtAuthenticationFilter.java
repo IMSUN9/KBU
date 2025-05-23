@@ -1,5 +1,6 @@
 package com.example.calendar.jwt;
 
+import com.example.calendar.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,32 +21,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 1. Authorization 헤더에서 JWT 추출
         String authHeader = request.getHeader("Authorization");
+
+        // 헤더가 없거나 "Bearer "로 시작하지 않으면 필터 진행
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // "Bearer " 다음 문자열이 실제 토큰
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(7); // "Bearer " 제거
 
-        // 2. JWT 유효성 검증 로직 (임시: 항상 성공 처리)
-        if (!token.isBlank() && SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
+            // 🔐 JWT 유효성 검사 및 사용자명 추출
+            String username = JwtUtil.getUsernameFromToken(token);
 
-            // 👉 실제 구현에서는 JwtUtil 등을 이용해 username 추출
-            String username = "authenticatedUser"; // 임시 사용자명
+            // 인증되지 않은 상태라면 SecurityContext에 설정
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(username, null, null);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, null, null);
-
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            // 3. SecurityContextHolder에 인증 정보 등록
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+            System.out.println("❌ JWT 유효성 검사 실패: " + e.getMessage());
         }
 
-        // 4. 다음 필터로 진행
         filterChain.doFilter(request, response);
     }
 }

@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8" />
     <title>일정 관리 캘린더</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <!-- ✅ moment.js CDN (순서 중요!) -->
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+
+    <!-- ✅ CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- ✅ JS -->
     <script src="js/index.js" defer></script>
     <script src="js/logout.js" defer></script>
 </head>
 <body>
 <div class="top-bar">
     <h1>📅 나의 일정 관리</h1>
-    <button id="logout-btn">로그아웃</button> <!-- ✅ 로그아웃 버튼 추가 -->
+    <button id="logout-btn">로그아웃</button>
 </div>
 
 <div id="calendar"></div>
