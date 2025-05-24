@@ -611,32 +611,84 @@ body {
   background-color: #c0392b;
 }
 
+/* 🔷 일정 추가 모달 스타일 개선 */
 .add-modal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
 .modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 320px;
   text-align: center;
 }
 
-.modal-content input,
-.modal-content select {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
+.modal-content h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: bold;
 }
 
+.modal-content input[type="text"],
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: border-color 0.3s;
+}
 
+.modal-content input[type="text"]:focus,
+.modal-content select:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-actions #submit-event {
+  background-color: #3498db;
+  color: white;
+}
+
+.modal-actions #submit-event:hover {
+  background-color: #2980b9;
+}
+
+.modal-actions #cancel-event {
+  background-color: #ccc;
+  color: #333;
+}
+
+.modal-actions #cancel-event:hover {
+  background-color: #bbb;
+}
 

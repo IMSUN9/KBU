@@ -53,6 +53,34 @@ function showAddModal({ onSubmit, onCancel }) {
     };
   }
 
+  function showConfirmModal({ eventName, onConfirm, onCancel }) {
+    const modal = document.createElement('div');
+    modal.className = 'confirm-modal';
+
+    modal.innerHTML = `
+      <div class="confirm-box">
+        <p><strong>"${eventName}"</strong> 일정을 삭제하시겠습니까?</p>
+        <div class="modal-buttons">
+          <button class="btn-yes">삭제</button>
+          <button class="btn-no">취소</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector('.btn-yes').onclick = () => {
+      onConfirm();
+      modal.remove();
+    };
+
+    modal.querySelector('.btn-no').onclick = () => {
+      onCancel();
+      modal.remove();
+    };
+  }
+
+
 // 🔐 캘린더 실행 함수 시작
 !function () {
   const today = moment();
@@ -291,11 +319,16 @@ function showAddModal({ onSubmit, onCancel }) {
     fetch(`http://localhost:8080/api/events?title=${encodeURIComponent(ev.eventName)}&type=${encodeURIComponent(ev.calendar)}&date=${ev.date.format('YYYY-MM-DD')}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + getToken()
+        'Authorization': 'Bearer ' + getToken()  // ✅ JWT 토큰 포함
       }
     })
       .then(res => {
-        if (!res.ok) throw new Error('삭제 실패');
+        if (!res.ok) {
+          console.error('❌ 삭제 요청 실패 상태코드:', res.status);
+          throw new Error('삭제 실패');
+        }
+
+        // ✅ 정상 응답일 때만 삭제 처리
         const index = this.events.indexOf(ev);
         if (index > -1) this.events.splice(index, 1);
         this.renderEvents(this.events.filter(e => e.date.isSame(ev.date, 'day')), ele);
@@ -311,6 +344,7 @@ function showAddModal({ onSubmit, onCancel }) {
       })
       .catch(handleFetchError);
   };
+
 
   Calendar.prototype.drawLegend = function () {
     const legend = createElement('div', 'legend');
