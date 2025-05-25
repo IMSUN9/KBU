@@ -65,3 +65,20 @@ body {
 .error {
   color: red;
 }
+
+#kakao-login-btn {
+  background-color: #FEE500;       /* 카카오 노란색 */
+  color: #000000;                  /* 텍스트는 검정 */
+  border: none;
+  padding: 10px;
+  width: 100%;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+#kakao-login-btn:hover {
+  background-color: #ffeb3b;
+}
+
