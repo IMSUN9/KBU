@@ -1,0 +1,57 @@
+<!-- 📄 kakao-login.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>카카오 로그인 처리 중...</title>
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+</head>
+<body>
+<p>카카오 로그인 처리 중입니다...</p>
+
+<script>
+    Kakao.init('카카오_자바스크립트_키'); // 여기에 본인 앱의 JS 키 입력
+
+    // ✅ 토큰 확인
+    const token = Kakao.Auth.getAccessToken();
+    if (!token) {
+      alert("카카오 토큰 없음. 로그인 실패");
+      window.location.href = "/login.html";
+    }
+
+    // ✅ 사용자 정보 요청
+    Kakao.API.request({
+      url: '/v2/user/me',
+      success: function (res) {
+        console.log("✅ 사용자 정보", res);
+        const kakaoId = res.id;
+        const nickname = res.properties?.nickname || "KakaoUser";
+
+        // ✅ 백엔드 로그인 요청 (JWT 발급)
+        fetch(`http://localhost:8080/api/auth/kakao-login?kakaoId=${kakaoId}&nickname=${encodeURIComponent(nickname)}`, {
+          method: "POST"
+        })
+          .then(res => {
+            if (!res.ok) throw new Error("서버 오류");
+            return res.text(); // JWT
+          })
+          .then(token => {
+            localStorage.setItem("token", token);
+            alert(`${nickname}님, 로그인 성공!`);
+            window.location.href = "/index.html";
+          })
+          .catch(err => {
+            console.error("❌ 백엔드 로그인 실패:", err);
+            alert("카카오 로그인 처리 중 오류 발생");
+            window.location.href = "/login.html";
+          });
+      },
+      fail: function (error) {
+        console.error("❌ 사용자 정보 요청 실패:", error);
+        alert("카카오 사용자 정보 요청 실패");
+        window.location.href = "/login.html";
+      }
+    });
+</script>
+</body>
+</html>
