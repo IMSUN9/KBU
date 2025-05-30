@@ -4,85 +4,25 @@
     <meta charset="UTF-8" />
     <title>로그인</title>
     <link rel="stylesheet" href="css/login.css" />
-
-    <!-- ✅ Kakao JavaScript SDK -->
-    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
-    <script>
-        Kakao.init('1c32879542069ac7776ac22372d880d3'); // ✅ 본인 JS 키로 설정
-        console.log('✅ Kakao SDK 초기화 상태:', Kakao.isInitialized());
-    </script>
 </head>
 <body>
 
 <div class="login-container">
     <h2>로그인</h2>
 
-    <!-- ✅ 일반 로그인 입력 -->
+    <!-- ✅ 일반 로그인 -->
     <input type="text" id="username" placeholder="아이디 입력" />
     <input type="password" id="password" placeholder="비밀번호 입력" />
     <button onclick="login()">로그인</button>
 
-    <!-- ✅ 카카오 로그인 버튼 -->
-    <button id="kakao-login-btn">카카오로 로그인</button>
+    <!-- ✅ 카카오 로그인 버튼 (스타일 적용을 위해 id 추가) -->
+    <button id="kakao-login-btn" onclick="kakaoLogin()">카카오로 로그인</button>
 
-    <!-- ✅ 메시지 출력 -->
+    <!-- ✅ 메시지 영역 및 회원가입 링크 -->
     <p id="login-message"></p>
     <p>계정이 없으신가요? <a href="signup.html">회원가입</a></p>
 </div>
 
-<!-- ✅ 일반 로그인 & 카카오 리디렉션 스크립트 -->
-<script>
-    // ✅ 일반 로그인
-    function login() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const messageEl = document.getElementById("login-message");
-
-      if (!username || !password) {
-        messageEl.textContent = "아이디와 비밀번호를 모두 입력하세요.";
-        messageEl.className = "error";
-        return;
-      }
-
-      fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      })
-        .then(res => {
-          if (!res.ok) {
-            if (res.status === 401 || res.status === 403) {
-              throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
-            }
-            throw new Error("서버 오류가 발생했습니다.");
-          }
-          return res.text();
-        })
-        .then(token => {
-          localStorage.setItem("token", token);
-          messageEl.textContent = "로그인 성공! 잠시 후 이동합니다...";
-          messageEl.className = "success";
-          setTimeout(() => window.location.href = "/index.html", 1000);
-        })
-        .catch(err => {
-          messageEl.textContent = "❌ 로그인 실패: " + err.message;
-          messageEl.className = "error";
-        });
-    }
-
-    // ✅ 카카오 로그인 (사용자 계정 선택 UI 포함)
-    document.addEventListener("DOMContentLoaded", () => {
-      const kakaoBtn = document.getElementById("kakao-login-btn");
-      if (kakaoBtn) {
-        kakaoBtn.addEventListener("click", () => {
-          Kakao.Auth.authorize({
-            redirectUri: 'http://localhost:8081/kakao-login.html', // ✅ 로그인 완료 후 돌아올 위치
-            prompt: 'login'  // ✅ 매번 사용자 선택창 띄움
-          });
-        });
-      }
-    });
-</script>
-
+<script src="js/login.js"></script>
 </body>
 </html>

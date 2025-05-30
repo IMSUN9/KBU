@@ -18,6 +18,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    // ✅ 새로 추가: 카카오 access token 저장용 필드
+    @Column(name = "kakao_access_token", columnDefinition = "TEXT")
+    private String kakaoAccessToken;
+
     // 생성자
     public User() {}
 
@@ -26,7 +30,8 @@ public class User {
         this.password = password;
     }
 
-    // Getter/Setter
+    // ✅ Getter/Setter
+
     public Long getId() {
         return id;
     }
@@ -44,4 +49,12 @@ public class User {
     }
 
     public void setPassword(String password) { this.password = password; }
+
+    public String getKakaoAccessToken() {
+        return kakaoAccessToken;
+    }
+
+    public void setKakaoAccessToken(String kakaoAccessToken) {
+        this.kakaoAccessToken = kakaoAccessToken;
+    }
 }

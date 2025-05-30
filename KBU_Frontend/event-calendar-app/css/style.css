@@ -584,12 +584,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #3498db;
+  background-color: #9b59b6;
   color: white;
-  padding: 15px 25px;
-  font-size: 20px;
+  padding: 0px 25px;
+  font-size: 15px;
   font-weight: bold;
-  border-bottom: 2px solid #2980b9;
   position: sticky;
   top: 0;
   z-index: 1000;

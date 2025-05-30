@@ -1,44 +1,55 @@
 package com.example.calendar.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
-// ✅ DB의 테이블로 매핑할 수 있도록 설정
+/**
+ * 📌 Event 엔티티 - 사용자별 일정 정보 저장
+ */
 @Entity
 public class Event {
 
-    // ✅ 기본 키 지정 (자동 생성)
+    // ✅ 고유 ID (PK)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ✅ 일정 제목
+    @Column(nullable = false)
     private String title;
-    private String type;
-    private String date;
 
-    // ✅ 이 일정(Event)이 어떤 사용자의 것인지 저장하기 위한 필드
+    // ✅ 일정 유형
+    @Column(nullable = false)
+    private String type;
+
+    // ✅ 일정 날짜 (형식: YYYY-MM-DD)
+    @Column(nullable = false)
+    private LocalDate date;
+
+    // ✅ 연관 사용자 정보 (ManyToOne)
     @ManyToOne
-    @JoinColumn(name = "user_id") // DB에서 외래키 이름은 user_id
+    @JoinColumn(name = "user_id") // 외래키: user_id
     private User user;
 
-    // ✅ 기본 생성자 (JPA에서 필수)
+    // ✅ 기본 생성자 (JPA 필수)
     public Event() {}
 
-    // ✅ 생성자 (User는 나중에 setter로 주입 가능)
-    public Event(String title, String type, String date) {
+    // ✅ 생성자: user 없이
+    public Event(String title, String type, LocalDate date) {
         this.title = title;
         this.type = type;
         this.date = date;
     }
 
-    // ✅ 전체 필드 포함 생성자
-    public Event(String title, String type, String date, User user) {
+    // ✅ 생성자: user 포함
+    public Event(String title, String type, LocalDate date, User user) {
         this.title = title;
         this.type = type;
         this.date = date;
         this.user = user;
     }
 
-    // ✅ getter/setter
+    // ✅ Getter / Setter
     public Long getId() {
         return id;
     }
@@ -57,10 +68,10 @@ public class Event {
         this.type = type;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

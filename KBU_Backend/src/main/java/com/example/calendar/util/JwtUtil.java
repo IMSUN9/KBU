@@ -2,11 +2,13 @@ package com.example.calendar.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
     // ✅ 고정된 시크릿 키를 Base64로 인코딩해서 사용

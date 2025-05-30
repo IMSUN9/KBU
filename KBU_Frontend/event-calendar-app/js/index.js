@@ -142,7 +142,7 @@ function showAddModal({ onSubmit, onCancel }) {
     const clone = this.current.clone();
     const dayOfWeek = clone.day();
     if (!dayOfWeek) return;
-    clone.subtract('days', dayOfWeek + 1);
+    clone.subtract(dayOfWeek + 1, 'days');
     for (let i = dayOfWeek; i > 0; i--) {
       this.drawDay(clone.add(1, 'days'));
     }
