@@ -8,11 +8,13 @@ import com.example.calendar.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/events")
@@ -81,5 +83,43 @@ public class EventController {
             return eventRepository.findByUser(user);
         }
         return List.of();
+    }
+
+    // ✅ 이번 달 일정 통계 조회 API
+    @GetMapping("/statistics")
+    public ResponseEntity<?> getEventStatistics(HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패: 사용자 정보를 찾을 수 없습니다.");
+        }
+
+        // 🗓️ 이번 달의 시작과 끝 날짜 계산
+        LocalDate now = LocalDate.now();
+        LocalDate startOfMonth = now.withDayOfMonth(1);
+        LocalDate endOfMonth = now.withDayOfMonth(now.lengthOfMonth());
+
+        // 📥 이번 달 일정 가져오기
+        List<Event> events = eventRepository.findByUserAndDateBetween(user, startOfMonth, endOfMonth);
+
+        // 📊 통계용 맵 생성
+        Map<String, Integer> typeCounts = new HashMap<>();      // 유형별 개수
+        Map<String, Integer> dailyCounts = new TreeMap<>();     // 날짜별 개수 (정렬용으로 TreeMap 사용)
+
+        for (Event event : events) {
+            // 1) 유형별 개수
+            String type = event.getType();
+            typeCounts.put(type, typeCounts.getOrDefault(type, 0) + 1);
+
+            // 2) 날짜별 개수
+            String date = event.getDate().toString(); // yyyy-MM-dd 형식
+            dailyCounts.put(date, dailyCounts.getOrDefault(date, 0) + 1);
+        }
+
+        // ✅ 응답 구성
+        Map<String, Object> response = new HashMap<>();
+        response.put("typeCounts", typeCounts);
+        response.put("dailyCounts", dailyCounts);
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -349,11 +349,13 @@ function showAddModal({ onSubmit, onCancel }) {
   Calendar.prototype.drawLegend = function () {
     const legend = createElement('div', 'legend');
     const types = [
-      { name: 'Work', color: 'orange' },
-      { name: 'Sports', color: 'blue' },
-      { name: 'Friend', color: 'yellow' },
-      { name: 'Other', color: 'green' }
-    ];
+      { name: 'Friend', color: 'pink' },   // #FF6384
+          { name: 'Work', color: 'blue' },     // #36A2EB
+          { name: 'Sports', color: 'yellow' }, // #FFCE56
+          { name: 'Other', color: 'green' }    // #6BCB77
+        ];
+
+
     const seen = new Set();
 
     types.forEach(t => addLegendEntry(legend, t, seen));
@@ -383,12 +385,16 @@ function showAddModal({ onSubmit, onCancel }) {
 
   function getColor(type) {
     switch (type.toLowerCase()) {
-      case 'work': return 'orange';
-      case 'sports': return 'blue';
-      case 'friend': return 'yellow';
-      default: return 'green';
+      case 'friend': return 'pink';      // #FF6384
+      case 'work': return 'blue';        // #36A2EB
+      case 'sports': return 'yellow';    // #FFCE56
+      case 'other': return 'green';      // #6BCB77
+      default: return 'gray';
     }
   }
+
+
+
 
   function addLegendEntry(container, entry, seen) {
     const key = entry.name + '|' + entry.color;
@@ -420,5 +426,128 @@ function showAddModal({ onSubmit, onCancel }) {
       new Calendar('#calendar', events);
     })
     .catch(handleFetchError);
+
+// 📊 통계 보기 버튼 클릭 시 모달 열기 + 차트 fetch & 렌더링
+document.getElementById("showStatsBtn").addEventListener("click", async () => {
+
+  const modal = document.getElementById("statsModal");
+  modal.style.display = "flex"; // 모달 띄우기
+
+  const topBar = document.querySelector(".top-bar");
+  if (topBar) topBar.style.display = "none";
+
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch("http://localhost:8080/api/events/statistics", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+    console.log("📊 통계 응답 데이터:", data);
+
+    drawTypeChart(data.typeCounts);
+    drawDailyChart(data.dailyCounts);
+
+  } catch (error) {
+    console.error("통계 요청 실패:", error);
+    alert("통계 데이터를 불러오는 데 실패했습니다.");
+  }
+});
+
+// ❌ 닫기 버튼 클릭 시 모달 숨기기
+document.getElementById("closeStatsBtn").addEventListener("click", () => {
+  document.getElementById("statsModal").style.display = "none";
+
+  const topBar = document.querySelector(".top-bar");
+  if (topBar) topBar.style.display = "flex";
+});
+
+
+// ✅ 유형별 도넛 차트 그리기
+function drawTypeChart(typeCounts) {
+  const ctx = document.getElementById("typeChart").getContext("2d");
+
+  // 안전하게 기존 차트 제거
+  if (window.typeChart && typeof window.typeChart.destroy === 'function') {
+    window.typeChart.destroy();
+  }
+
+  // 새 차트 생성
+  window.typeChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(typeCounts),
+      datasets: [{
+        label: "유형별 일정 수",
+        data: Object.values(typeCounts),
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#6BCB77', '#845EC2'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        title: {
+          display: true,
+          text: '📌 일정 유형별 통계'
+        }
+      }
+    }
+  });
+}
+
+// ✅ 날짜별 막대 차트 그리기
+function drawDailyChart(dailyCounts) {
+  const ctx = document.getElementById("dailyChart").getContext("2d");
+
+  // 안전하게 기존 차트 제거
+  if (window.dailyChart && typeof window.dailyChart.destroy === 'function') {
+    window.dailyChart.destroy();
+  }
+
+  // 새 차트 생성
+  window.dailyChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(dailyCounts),
+      datasets: [{
+        label: "일정 수",
+        data: Object.values(dailyCounts),
+        backgroundColor: "#36A2EB"
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: '📅 날짜별 일정 수 (이번 달)'
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: '날짜'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: '일정 개수'
+          }
+        }
+      }
+    }
+  });
+}
+
 
 }();

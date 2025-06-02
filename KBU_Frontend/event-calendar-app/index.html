@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>일정 관리 캘린더</title>
+
     <!-- ✅ moment.js CDN (순서 중요!) -->
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+
+    <!-- ✅ Chart.js CDN (통계 시각화용) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- ✅ CSS -->
     <link rel="stylesheet" href="css/style.css" />
@@ -12,6 +16,7 @@
     <!-- ✅ JS -->
     <script src="js/index.js" defer></script>
     <script src="js/logout.js" defer></script>
+
 </head>
 <body>
 <div class="top-bar">
@@ -19,6 +24,23 @@
     <button id="logout-btn">로그아웃</button>
 </div>
 
+<!-- ✅ 달력 렌더링 영역 (그대로 유지) -->
 <div id="calendar"></div>
+
+<!-- ✅ 통계 보기 버튼: 위치는 위의 style로 띄움 -->
+<button id="showStatsBtn">📊 통계 보기</button>
+
+<!-- ✅ 통계 차트 출력 영역 -->
+<!-- ✅ 통계 모달 (초기에는 숨김 처리) -->
+<div id="statsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <button id="closeStatsBtn" class="close-button">✕</button>
+        <h2>📊 일정 유형별 통계</h2>
+        <canvas id="typeChart" width="400" height="300"></canvas>
+        <h2 style="margin-top: 30px;">📅 날짜별 일정 수 (이번 달)</h2>
+        <canvas id="dailyChart" width="600" height="300"></canvas>
+    </div>
+</div>
+
 </body>
 </html>

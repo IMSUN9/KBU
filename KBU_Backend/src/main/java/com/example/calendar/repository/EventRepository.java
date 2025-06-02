@@ -26,4 +26,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     // ✅ 특정 사용자(User)가 등록한 일정 중 title, type, date가 모두 일치하는 일정 삭제
     void deleteByUserAndTitleAndTypeAndDate(User user, String title, String type, LocalDate date);
+
+    // ✅ [추가] 특정 사용자(User)의 이번 달 일정 조회 (통계용)
+    List<Event> findByUserAndDateBetween(User user, LocalDate start, LocalDate end);
 }

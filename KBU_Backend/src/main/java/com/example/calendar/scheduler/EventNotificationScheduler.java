@@ -26,7 +26,7 @@ public class EventNotificationScheduler {
     }
 
     // ✅ 매일 22:00에 실행
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 22 * * *")
     public void notifyUpcomingEvents() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 

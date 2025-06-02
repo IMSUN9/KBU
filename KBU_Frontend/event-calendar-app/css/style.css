@@ -301,39 +301,45 @@ body {
   transition: background-color 0.3s; /* 부드럽게 */
 }
 
-
 .legend {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 30px;
+  height: 40px;
   background: rgba(60, 60, 60, 1);
-  line-height: 30px;
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .entry {
-  position: relative;
-  padding: 0 0 0 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 13px;
-  display: inline-block;
-  line-height: 30px;
-  background: transparent;
+  font-weight: bold;
+  color: black;           /* ✅ 모든 텍스트를 검정색으로 통일 */
+  padding: 5px 12px;
+  border-radius: 6px;
 }
 
-.entry:after {
-  position: absolute;
-  content: '';
-  height: 5px;
-  width: 5px;
-  top: 12px;
-  left: 14px;
+.entry.blue {
+  background-color: #36A2EB;
+}
+.entry.orange {
+  background-color: #FF9F40;
+}
+.entry.green {
+  background-color: #6BCB77;
+}
+.entry.yellow {
+  background-color: #FFCD56;
+}
+.entry.pink {
+  background-color: #FF6384;
 }
 
-.entry.blue:after { background: rgba(156, 202, 235, 1); }
-.entry.orange:after { background: rgba(247, 167, 0, 1); }
-.entry.green:after { background: rgba(153, 198, 109, 1); }
-.entry.yellow:after { background: rgba(249, 233, 0, 1); }
 
 .add-event-button
 {
@@ -690,4 +696,85 @@ body {
 .modal-actions #cancel-event:hover {
   background-color: #bbb;
 }
+
+/* 📊 통계 보기 버튼 위치 및 스타일 */
+#showStatsBtn {
+  position: absolute;
+  top: 140px;
+  right: 380px; /* ← 이 값을 조정해서 살짝 왼쪽 이동 가능 */
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  z-index: 10;
+}
+
+#showStatsBtn:hover {
+  background-color: #f0f0f0;
+}
+
+/* ✅ 모달 배경 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  width: 95%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  color: white;
+  position: relative;
+}
+
+/* ✅ 차트 크기 조절 */
+.modal-content canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 300px;
+}
+
+
+/* ✅ 닫기 버튼 */
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* 📌 일정 카테고리별 색상 정의 (모달과 legend 일치) */
+.pink {
+  background-color: #FF6384;
+}
+.blue {
+  background-color: #36A2EB;
+}
+.yellow {
+  background-color: #FFCE56;
+}
+.green {
+  background-color: #6BCB77;
+}
+
 
