@@ -699,22 +699,40 @@ body {
 
 /* 📊 통계 보기 버튼 위치 및 스타일 */
 #showStatsBtn {
-  position: absolute;
-  top: 140px;
-  right: 380px; /* ← 이 값을 조정해서 살짝 왼쪽 이동 가능 */
-  padding: 8px 16px;
-  font-size: 14px;
-  border-radius: 6px;
-  background-color: #ffffff;
-  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  color: #333;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: all 0.25s ease-in-out;
   cursor: pointer;
-  transition: background 0.2s ease;
-  z-index: 10;
 }
 
 #showStatsBtn:hover {
-  background-color: #f0f0f0;
+  background: linear-gradient(135deg, #36A2EB, #845EC2);
+  color: white;
+  transform: translateY(-2px);
 }
+
+#showStatsBtn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* 📊 통계 버튼을 캘린더 오른쪽 상단에 고정 배치 */
+.stats-button-wrapper {
+  position: absolute;
+  top: 110px;         /* 필요시 조정 */
+  right: 350px;        /* 오른쪽 여백 */
+  z-index: 10;
+}
+
 
 /* ✅ 모달 배경 */
 .modal-overlay {
