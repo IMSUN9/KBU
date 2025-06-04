@@ -642,7 +642,7 @@ body {
 .modal-content h3 {
   font-size: 24px;
   margin-bottom: 20px;
-  color: #333;
+  color: #9b59b6; /* 💜 보라색 계열 */
   font-weight: bold;
 }
 
@@ -680,7 +680,7 @@ body {
 }
 
 .modal-actions #submit-event {
-  background-color: #3498db;
+  background-color: #9b59b6;  /* 보라색 */
   color: white;
 }
 
@@ -729,7 +729,7 @@ body {
 .stats-button-wrapper {
   position: absolute;
   top: 110px;         /* 필요시 조정 */
-  right: 350px;        /* 오른쪽 여백 */
+  right: 420px;        /* 오른쪽 여백 */
   z-index: 10;
 }
 
