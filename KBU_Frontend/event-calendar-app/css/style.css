@@ -703,20 +703,22 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  font-size: 16px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #ffffff, #f0f0f0);
-  color: #333;
+  font-size: 15px;
+  font-weight: bold;
+  background: #9b59b6; /* 보라색 배경 */
+  color: white;
   border: none;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.25s ease-in-out;
   cursor: pointer;
+  position: absolute;
+  top: 100px;
+  right: 10px;
 }
 
 #showStatsBtn:hover {
-  background: linear-gradient(135deg, #36A2EB, #845EC2);
-  color: white;
+  background: #8e44ad; /* 더 짙은 보라색 */
   transform: translateY(-2px);
 }
 
@@ -724,6 +726,7 @@ body {
   width: 20px;
   height: 20px;
 }
+
 
 /* 📊 통계 버튼을 캘린더 오른쪽 상단에 고정 배치 */
 .stats-button-wrapper {
