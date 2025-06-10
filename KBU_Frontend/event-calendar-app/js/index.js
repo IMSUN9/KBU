@@ -205,45 +205,69 @@ function showAddModal({ onSubmit, onCancel }) {
     return classes.join(' ');
   };
 
-  Calendar.prototype.openDay = function (el) {
-    document.querySelectorAll('.day.selected').forEach(el => el.classList.remove('selected'));
-    el.classList.add('selected');
+Calendar.prototype.openDay = function (el) {
+  // 기존 선택된 날짜 초기화 후 현재 선택
+  document.querySelectorAll('.day.selected').forEach(el => el.classList.remove('selected'));
+  el.classList.add('selected');
 
-    const dateStr = el.getAttribute('data-date');
-    const day = moment(dateStr, 'YYYY-MM-DD');
-    let details, arrow;
-    const currentOpened = document.querySelector('.details');
+  const dateStr = el.getAttribute('data-date');
+  const day = moment(dateStr, 'YYYY-MM-DD');
+  let details, arrow;
+  const currentOpened = document.querySelector('.details');
 
-    if (currentOpened && currentOpened.parentNode === el.parentNode && currentOpened.getAttribute('data-date') === dateStr) {
-      details = currentOpened;
-      arrow = document.querySelector('.arrow');
-    } else {
-      if (currentOpened) {
-        currentOpened.addEventListener('animationend', () => currentOpened.remove());
-        currentOpened.className = 'details out';
-      }
-      details = createElement('div', 'details in');
-      details.setAttribute('data-date', dateStr);
-      arrow = createElement('div', 'arrow');
-      details.appendChild(arrow);
-
-      const addBtn = createElement('button', 'add-event-button', 'Add Event');
-      addBtn.addEventListener('click', () => {
-        showAddModal({
-          onSubmit: (title, type) => this.addEvent(title, type, day, details),
-          onCancel: () => {}
-        });
-      });
-
-      details.appendChild(addBtn);
-      el.parentNode.appendChild(details);
+  if (
+    currentOpened &&
+    currentOpened.parentNode === el.parentNode &&
+    currentOpened.getAttribute('data-date') === dateStr
+  ) {
+    details = currentOpened;
+    arrow = document.querySelector('.arrow');
+  } else {
+    if (currentOpened) {
+      currentOpened.addEventListener('animationend', () => currentOpened.remove());
+      currentOpened.className = 'details out';
     }
 
-    const todaysEvents = this.events.filter(ev => ev.date.isSame(day, 'day'));
-    this.renderEvents(todaysEvents, details);
+    details = createElement('div', 'details in');
+    details.setAttribute('data-date', dateStr);
 
-    arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 27 + 'px';
-  };
+    arrow = createElement('div', 'arrow');
+    details.appendChild(arrow);
+
+    // ✅ 상단 컨트롤 박스 생성
+    const topControls = createElement('div', 'detail-controls');
+
+    // ✅ 일정 추가 버튼
+    const addEventBtn = createElement('button', 'add-event-button', 'Add Event');
+    addEventBtn.addEventListener('click', () => {
+      showAddModal({
+        onSubmit: (title, type) => this.addEvent(title, type, day, details),
+        onCancel: () => {}
+      });
+    });
+
+    // ✅ 상세 보기 버튼
+    const detailBtn = createElement('button', 'detail-button', '📌');
+    detailBtn.addEventListener('click', () => {
+      openDetailModal(this.events.filter(ev => ev.date.isSame(day, 'day')));
+    });
+
+    // ✅ 버튼들을 상단에 배치
+    topControls.appendChild(addEventBtn);
+    topControls.appendChild(detailBtn);
+    details.appendChild(topControls);
+
+    el.parentNode.appendChild(details);
+  }
+
+  // 해당 날짜 이벤트 렌더링
+  const todaysEvents = this.events.filter(ev => ev.date.isSame(day, 'day'));
+  this.renderEvents(todaysEvents, details);
+
+  // 화살표 위치 조정
+  arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 27 + 'px';
+};
+
 
   Calendar.prototype.addEvent = function (title, type, day, details) {
     const newEvent = { title, type, date: day.format('YYYY-MM-DD') };
@@ -548,6 +572,36 @@ function drawDailyChart(dailyCounts) {
     }
   });
 }
+
+// ✅ 모달 열기 함수
+function openDetailModal(events) {
+  const modal = document.getElementById('detailModal');
+  const list = document.getElementById('detailList');
+  list.innerHTML = '';
+
+  events.forEach(ev => {
+    const li = document.createElement('li');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `chk-${ev.eventName}-${ev.date.format('YYYYMMDD')}`;
+
+    const label = document.createElement('label');
+    label.textContent = ev.eventName;
+    label.setAttribute('for', checkbox.id);
+
+    li.appendChild(checkbox);
+    li.appendChild(label);
+    list.appendChild(li);
+  });
+
+  modal.style.display = 'flex';
+}
+
+// ✅ 모달 닫기
+document.getElementById('closeDetailBtn').addEventListener('click', () => {
+  document.getElementById('detailModal').style.display = 'none';
+});
+
 
 
 }();
