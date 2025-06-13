@@ -580,14 +580,62 @@ function openDetailModal(events) {
   list.innerHTML = '';
 
   events.forEach(ev => {
+    // ✅ 여기에서 로그 출력해서 ev 객체 상태 확인
+    console.log("📌 이벤트 객체:", ev);
+    console.log("📌 이벤트 ID:", ev.id);
+
     const li = document.createElement('li');
+    li.dataset.eventId = ev.id;  // 여기! 이벤트 ID 저장
+
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = `chk-${ev.eventName}-${ev.date.format('YYYYMMDD')}`;
 
+    // ✅ 기존에 완료된 일정이라면 체크 + 취소선 추가
+    if (ev.completed) {
+      checkbox.checked = true;
+      li.classList.add('completed');
+    }
+
     const label = document.createElement('label');
     label.textContent = ev.eventName;
     label.setAttribute('for', checkbox.id);
+
+    // ✅ 체크박스 클릭 시 완료 스타일 토글 + 서버에 상태 전송
+    checkbox.addEventListener('change', () => {
+      const eventId = li.dataset.eventId;  // ← 여기에서 ID 안전하게 가져옴
+      const completed = checkbox.checked;
+
+      // ✅ 스타일 업데이트
+      if (completed) {
+        li.classList.add('completed');
+      } else {
+        li.classList.remove('completed');
+      }
+
+      // ✅ 서버에 완료 상태 전송
+      fetch(`/api/events/${eventId}/complete`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ completed })
+      })
+        .then(response => {
+          if (!response.ok) throw new Error("업데이트 실패");
+        })
+        .catch(error => {
+          alert("⚠️ 상태 업데이트 실패");
+          // 실패 시 상태 복원
+          checkbox.checked = !completed;
+          if (checkbox.checked) {
+            li.classList.add('completed');
+          } else {
+            li.classList.remove('completed');
+          }
+        });
+    });
 
     li.appendChild(checkbox);
     li.appendChild(label);
@@ -596,6 +644,7 @@ function openDetailModal(events) {
 
   modal.style.display = 'flex';
 }
+
 
 // ✅ 모달 닫기
 document.getElementById('closeDetailBtn').addEventListener('click', () => {

@@ -85,6 +85,38 @@ public class EventController {
         return List.of();
     }
 
+    // ✅ 일정 완료 상태 업데이트 API
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<?> updateEventCompletion(@PathVariable Long id,
+                                                   @RequestBody Map<String, Boolean> requestBody,
+                                                   HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 인증 실패");
+        }
+
+        Optional<Event> optionalEvent = eventRepository.findById(id);
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("일정을 찾을 수 없습니다.");
+        }
+
+        Event event = optionalEvent.get();
+        if (!event.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("해당 일정에 접근할 수 없습니다.");
+        }
+
+        Boolean completed = requestBody.get("completed");
+        if (completed == null) {
+            return ResponseEntity.badRequest().body("completed 필드가 필요합니다.");
+        }
+
+        event.setCompleted(completed);
+        eventRepository.save(event);
+
+        return ResponseEntity.ok("일정 완료 상태가 변경되었습니다.");
+    }
+
+
     // ✅ 이번 달 일정 통계 조회 API
     @GetMapping("/statistics")
     public ResponseEntity<?> getEventStatistics(HttpServletRequest request) {

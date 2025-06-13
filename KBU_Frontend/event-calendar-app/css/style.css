@@ -871,3 +871,51 @@ body {
 .detail-content button:hover {
   background: #7d3bb0;
 }
+
+.detail-content h3 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #9b59b6;
+}
+
+.detail-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.detail-content li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.detail-content input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.detail-content li.completed {
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.detail-content button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 10px;
+  background: #9b59b6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.detail-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
