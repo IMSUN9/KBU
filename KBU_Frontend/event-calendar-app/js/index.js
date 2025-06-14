@@ -205,6 +205,7 @@ function showAddModal({ onSubmit, onCancel }) {
     return classes.join(' ');
   };
 
+
 Calendar.prototype.openDay = function (el) {
   // 기존 선택된 날짜 초기화 후 현재 선택
   document.querySelectorAll('.day.selected').forEach(el => el.classList.remove('selected'));
@@ -213,6 +214,7 @@ Calendar.prototype.openDay = function (el) {
   const dateStr = el.getAttribute('data-date');
   const day = moment(dateStr, 'YYYY-MM-DD');
   let details, arrow;
+
   const currentOpened = document.querySelector('.details');
 
   if (
@@ -249,7 +251,10 @@ Calendar.prototype.openDay = function (el) {
     // ✅ 상세 보기 버튼
     const detailBtn = createElement('button', 'detail-button', '📌');
     detailBtn.addEventListener('click', () => {
-      openDetailModal(this.events.filter(ev => ev.date.isSame(day, 'day')));
+      const filtered = this.events.filter(ev =>
+        moment(ev.date).isSame(day, 'day')
+      );
+      openDetailModal(filtered); // ✅ 수정된 부분
     });
 
     // ✅ 버튼들을 상단에 배치
@@ -260,9 +265,12 @@ Calendar.prototype.openDay = function (el) {
     el.parentNode.appendChild(details);
   }
 
-  // 해당 날짜 이벤트 렌더링
-  const todaysEvents = this.events.filter(ev => ev.date.isSame(day, 'day'));
-  this.renderEvents(todaysEvents, details);
+  // ✅ 날짜 비교 시 moment(ev.date)로 변환
+  const todaysEvents = this.events.filter(ev =>
+    moment(ev.date).isSame(day, 'day')
+  );
+
+  this.renderEvents(todaysEvents, details); // ✅ 반드시 호출해야 UI 반영됨
 
   // 화살표 위치 조정
   arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 27 + 'px';
