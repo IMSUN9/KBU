@@ -450,10 +450,12 @@ this.renderEvents(todaysEvents, details);  // ← 이게 핵심
     })
     .then(eventList => {
       const events = eventList.map(ev => ({
+        id: ev.id,                // ✅ 이 줄 꼭 추가
         eventName: ev.title,
         calendar: ev.type,
         color: getColor(ev.type),
-        date: moment(ev.date, 'YYYY-MM-DD')
+        date: moment(ev.date, 'YYYY-MM-DD'),
+        completed: ev.completed // 이 값도 detail 모달에서 필요
       }));
       new Calendar('#calendar', events);
     })

@@ -85,8 +85,8 @@ public class EventController {
         return List.of();
     }
 
-    // ✅ 일정 완료 상태 업데이트 API
-    @PatchMapping("/{id}/complete")
+    // ✅ 일정 완료 상태 업데이트 (체크박스)
+    @RequestMapping(value = "/{id}/complete", method = RequestMethod.PATCH)
     public ResponseEntity<?> updateEventCompletion(@PathVariable Long id,
                                                    @RequestBody Map<String, Boolean> requestBody,
                                                    HttpServletRequest request) {
@@ -115,6 +115,7 @@ public class EventController {
 
         return ResponseEntity.ok("일정 완료 상태가 변경되었습니다.");
     }
+
 
 
     // ✅ 이번 달 일정 통계 조회 API
