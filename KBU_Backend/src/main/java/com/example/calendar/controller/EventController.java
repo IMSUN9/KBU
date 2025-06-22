@@ -18,7 +18,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/events")
-@CrossOrigin(origins = "http://localhost:63342", allowCredentials = "true")
+@CrossOrigin(originPatterns = {"http://localhost:*", "http://127.0.0.1:*"}, allowCredentials = "true")
 public class EventController {
 
     @Autowired
@@ -86,10 +86,11 @@ public class EventController {
     }
 
     // ✅ 일정 완료 상태 업데이트 (체크박스)
-    @RequestMapping(value = "/{id}/complete", method = RequestMethod.PATCH)
-    public ResponseEntity<?> updateEventCompletion(@PathVariable Long id,
-                                                   @RequestBody Map<String, Boolean> requestBody,
-                                                   HttpServletRequest request) {
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<?> updateEventCompletion(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> requestBody,
+            HttpServletRequest request) {
         User user = getUserFromRequest(request);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 인증 실패");

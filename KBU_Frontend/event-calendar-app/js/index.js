@@ -625,7 +625,7 @@ function openDetailModal(events) {
 
       // ✅ 서버에 완료 상태 전송
       fetch(`/api/events/${eventId}/complete`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
