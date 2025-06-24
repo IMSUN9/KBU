@@ -537,41 +537,64 @@ function drawTypeChart(typeCounts) {
 }
 
 // ✅ 날짜별 막대 차트 그리기
-function drawDailyChart(dailyCounts) {
+function drawDailyChart(dailyCountsByCategory) {
   const ctx = document.getElementById("dailyChart").getContext("2d");
 
-  // 안전하게 기존 차트 제거
   if (window.dailyChart && typeof window.dailyChart.destroy === 'function') {
     window.dailyChart.destroy();
   }
 
-  // 새 차트 생성
+  // ✅ 날짜 라벨 추출
+  const labels = Object.keys(dailyCountsByCategory).sort();
+
+  // ✅ 카테고리 목록 및 색상 매핑
+  const categoryColors = {
+    Friend: '#f87171',
+    Work: '#60a5fa',
+    Other: '#facc15',
+    Sports: '#4ade80'
+  };
+
+  const categories = Object.keys(categoryColors);
+
+  // ✅ 카테고리별 데이터 추출
+  const datasets = categories.map(category => ({
+    label: category,
+    backgroundColor: categoryColors[category],
+    data: labels.map(date => {
+      const dayData = dailyCountsByCategory[date] || {};
+      return dayData[category] || 0;
+    })
+  }));
+
+  // ✅ stacked bar chart 생성
   window.dailyChart = new Chart(ctx, {
-    type: "bar",
+    type: 'bar',
     data: {
-      labels: Object.keys(dailyCounts),
-      datasets: [{
-        label: "일정 수",
-        data: Object.values(dailyCounts),
-        backgroundColor: "#36A2EB"
-      }]
+      labels: labels,
+      datasets: datasets
     },
     options: {
       responsive: true,
       plugins: {
         title: {
           display: true,
-          text: '📅 날짜별 일정 수 (이번 달)'
+          text: '📅 날짜별 일정 수 (카테고리별)'
+        },
+        legend: {
+          position: 'bottom'
         }
       },
       scales: {
         x: {
+          stacked: true,
           title: {
             display: true,
             text: '날짜'
           }
         },
         y: {
+          stacked: true,
           beginAtZero: true,
           title: {
             display: true,
@@ -582,6 +605,7 @@ function drawDailyChart(dailyCounts) {
     }
   });
 }
+
 
 // ✅ 모달 열기 함수
 function openDetailModal(events) {

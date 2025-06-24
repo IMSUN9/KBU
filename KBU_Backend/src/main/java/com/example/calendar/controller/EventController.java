@@ -118,8 +118,7 @@ public class EventController {
     }
 
 
-
-    // ✅ 이번 달 일정 통계 조회 API
+    // ✅ 이번 달 일정 통계 조회 API (카테고리별 누적 막대그래프 대응)
     @GetMapping("/statistics")
     public ResponseEntity<?> getEventStatistics(HttpServletRequest request) {
         User user = getUserFromRequest(request);
@@ -136,23 +135,25 @@ public class EventController {
         List<Event> events = eventRepository.findByUserAndDateBetween(user, startOfMonth, endOfMonth);
 
         // 📊 통계용 맵 생성
-        Map<String, Integer> typeCounts = new HashMap<>();      // 유형별 개수
-        Map<String, Integer> dailyCounts = new TreeMap<>();     // 날짜별 개수 (정렬용으로 TreeMap 사용)
+        Map<String, Integer> typeCounts = new HashMap<>();                        // 유형별 개수
+        Map<String, Map<String, Integer>> dailyCounts = new TreeMap<>();         // 날짜별 + 유형별 개수
 
         for (Event event : events) {
+            String type = event.getType(); // 예: "Work"
+            String date = event.getDate().toString(); // 예: "2025-06-06"
+
             // 1) 유형별 개수
-            String type = event.getType();
             typeCounts.put(type, typeCounts.getOrDefault(type, 0) + 1);
 
-            // 2) 날짜별 개수
-            String date = event.getDate().toString(); // yyyy-MM-dd 형식
-            dailyCounts.put(date, dailyCounts.getOrDefault(date, 0) + 1);
+            // 2) 날짜 + 유형별 개수
+            dailyCounts.computeIfAbsent(date, d -> new HashMap<>())
+                    .merge(type, 1, Integer::sum);
         }
 
         // ✅ 응답 구성
         Map<String, Object> response = new HashMap<>();
         response.put("typeCounts", typeCounts);
-        response.put("dailyCounts", dailyCounts);
+        response.put("dailyCounts", dailyCounts);  // ✅ 변경된 구조
 
         return ResponseEntity.ok(response);
     }
