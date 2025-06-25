@@ -4,10 +4,8 @@
     <meta charset="UTF-8" />
     <title>일정 관리 캘린더</title>
 
-    <!-- ✅ moment.js CDN (순서 중요!) -->
+    <!-- ✅ CDN -->
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
-
-    <!-- ✅ Chart.js CDN (통계 시각화용) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- ✅ CSS -->
@@ -16,8 +14,8 @@
     <!-- ✅ JS -->
     <script src="js/index.js" defer></script>
     <script src="js/logout.js" defer></script>
-
 </head>
+
 <body>
 
 <!-- ✅ 상단 바 -->
@@ -26,19 +24,17 @@
     <button id="logout-btn">로그아웃</button>
 </div>
 
-<!-- ✅ 통계 보기 버튼: 위치는 위의 style로 띄움 -->
+<!-- ✅ 통계 보기 버튼 -->
 <div class="stats-button-wrapper">
-<button id="showStatsBtn">
-    <img src="https://img.icons8.com/color/48/000000/combo-chart.png" alt="chart-icon" />
-
-</button>
+    <button id="showStatsBtn">
+        <img src="https://img.icons8.com/color/48/000000/combo-chart.png" alt="chart-icon" />
+    </button>
 </div>
 
-<!-- ✅ 달력 렌더링 영역 (그대로 유지) -->
+<!-- ✅ 메인 콘텐츠 영역 -->
 <div id="calendar"></div>
 
-<!-- ✅ 통계 차트 출력 영역 -->
-<!-- ✅ 통계 모달 (초기에는 숨김 처리) -->
+<!-- ✅ 통계 모달 -->
 <div id="statsModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <button id="closeStatsBtn" class="close-button">✕</button>
@@ -58,6 +54,9 @@
         <button id="closeDetailBtn">닫기</button>
     </div>
 </div>
+
+<!-- ✅ 다가오는 일정 위젯 -->
+<div id="upcomingBox"></div>
 
 </body>
 </html>

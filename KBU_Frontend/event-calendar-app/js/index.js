@@ -458,8 +458,58 @@ this.renderEvents(todaysEvents, details);  // ← 이게 핵심
         completed: ev.completed // 이 값도 detail 모달에서 필요
       }));
       new Calendar('#calendar', events);
+      renderUpcomingEvents(events);  // ✅ 여기!
     })
     .catch(handleFetchError);
+
+function getCssColor(className) {
+  switch (className) {
+    case 'pink': return '#f87171';
+    case 'blue': return '#60a5fa';
+    case 'yellow': return '#facc15';
+    case 'green': return '#4ade80';
+    default: return '#ccc';
+  }
+}
+
+    function renderUpcomingEvents(events) {
+      const box = document.getElementById('upcomingBox');
+      box.innerHTML = '<h3>⏰ 다가오는 일정</h3>';
+
+      const today = moment();
+      const future = moment().add(3, 'days');
+
+      // 날짜별 그룹핑
+      const grouped = {};
+
+      events.forEach(ev => {
+        if (ev.date.isAfter(today, 'day') && ev.date.isSameOrBefore(future, 'day')) {
+          const key = ev.date.format('YYYY-MM-DD');
+          if (!grouped[key]) grouped[key] = [];
+          grouped[key].push(ev);
+        }
+      });
+
+      const sortedDates = Object.keys(grouped).sort();
+
+      sortedDates.forEach(dateStr => {
+        const dateMoment = moment(dateStr, 'YYYY-MM-DD');
+        const dayBlock = document.createElement('div');
+        dayBlock.className = 'upcoming-day';
+        dayBlock.innerHTML = `<strong>📅 ${dateMoment.format('MM/DD (dd)')}</strong>`;
+
+        grouped[dateStr].forEach(ev => {
+          const div = document.createElement('div');
+          div.className = 'upcoming-event';
+          div.textContent = `- ${ev.eventName} (${ev.calendar})`;
+          div.style.borderColor = getCssColor(ev.color);  // 기존 getColor 색상 변환
+          dayBlock.appendChild(div);
+        });
+
+        box.appendChild(dayBlock);
+      });
+    }
+
 
 // 📊 통계 보기 버튼 클릭 시 모달 열기 + 차트 fetch & 렌더링
 document.getElementById("showStatsBtn").addEventListener("click", async () => {
