@@ -923,7 +923,7 @@ body {
 #upcomingBox {
   position: fixed;
   top: 120px;
-  left: 180px; /* ✅ 기존 right: 20px → left: 20px */
+  left: 220px; /* ✅ 기존 right: 20px → left: 20px */
   width: 240px;
   max-height: 70vh;
   overflow-y: auto;
@@ -955,4 +955,27 @@ body {
   padding-left: 8px;
   border-left: 3px solid;
 }
+
+.filter-toggle-wrapper {
+  position: fixed;
+  right: 380px;     /* 오른쪽 → 왼쪽으로 위치 변경 */
+  top: 260px;    /* 상단(top) 대신 하단 기준 위치로 변경 */
+  z-index: 5;
+}
+
+#togglePastBtn {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #8882;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#togglePastBtn:hover {
+  background-color: #9993;
+}
+
 

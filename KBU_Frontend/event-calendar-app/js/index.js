@@ -15,6 +15,8 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
+let showPastEvents = true;  // ✅ 추가: 지난 일정 필터링 상태
+
 function showAddModal({ onSubmit, onCancel }) {
     const modal = document.createElement('div');
     modal.className = 'add-modal';
@@ -274,6 +276,13 @@ this.renderEvents(todaysEvents, details);  // ← 이게 핵심
   arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 27 + 'px';
 };
 
+// ✅ 지난 일정 필터링 함수
+function filterEvents(events) {
+  const today = moment(); // 오늘 날짜 객체
+  return showPastEvents
+    ? events                         // 전체 보기
+    : events.filter(ev => ev.date.isSameOrAfter(today, 'day')); // 오늘 이후만 보기
+}
 
 
 
@@ -457,8 +466,10 @@ this.renderEvents(todaysEvents, details);  // ← 이게 핵심
         date: moment(ev.date, 'YYYY-MM-DD'),
         completed: ev.completed // 이 값도 detail 모달에서 필요
       }));
-      new Calendar('#calendar', events);
-      renderUpcomingEvents(events);  // ✅ 여기!
+
+      const filtered = filterEvents(events);  // ✅ 필터 적용
+      new Calendar('#calendar', filtered);    // ✅ 필터링된 일정으로 캘린더 렌더링
+      renderUpcomingEvents(filtered);         // ✅ 다가오는 일정도 필터된 데이터 사용
     })
     .catch(handleFetchError);
 
@@ -734,6 +745,48 @@ function openDetailModal(events) {
 document.getElementById('closeDetailBtn').addEventListener('click', () => {
   document.getElementById('detailModal').style.display = 'none';
 });
+
+let showPastEvents = true;  // 전역 상태 변수 선언
+
+document.getElementById("togglePastBtn").addEventListener("click", () => {
+  showPastEvents = !showPastEvents;
+
+  // 버튼 텍스트 변경
+  const btn = document.getElementById("togglePastBtn");
+  btn.textContent = showPastEvents ? "지난 일정 숨기기" : "지난 일정 보기";
+
+  // 서버에서 이벤트 다시 가져와서 필터 적용 후 캘린더 렌더링
+  fetch("http://localhost:8080/api/events", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      "Content-Type": "application/json"
+    }
+  })
+    .then(res => res.json())
+    .then(eventList => {
+      const events = eventList.map(ev => ({
+        id: ev.id,
+        eventName: ev.title,
+        calendar: ev.type,
+        color: getColor(ev.type),
+        date: moment(ev.date, 'YYYY-MM-DD'),
+        completed: ev.completed
+      }));
+
+      const filtered = filterEvents(events);  // ✅ 지난 일정 필터링 적용
+
+      // ✅ 기존 캘린더 내용 초기화
+      const calendarEl = document.getElementById('calendar');
+      calendarEl.innerHTML = '';
+
+      // ✅ 새 캘린더 그리기
+      new Calendar('#calendar', filtered);
+      renderUpcomingEvents(filtered);
+    })
+    .catch(handleFetchError);
+});
+
 
 
 
