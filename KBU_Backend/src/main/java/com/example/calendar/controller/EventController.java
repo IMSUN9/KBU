@@ -120,7 +120,8 @@ public class EventController {
 
     // ✅ 이번 달 일정 통계 조회 API (카테고리별 누적 막대그래프 대응)
     @GetMapping("/statistics")
-    public ResponseEntity<?> getEventStatistics(HttpServletRequest request) {
+    public ResponseEntity<?> getEventStatistics(HttpServletRequest request)
+    {
         User user = getUserFromRequest(request);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패: 사용자 정보를 찾을 수 없습니다.");
@@ -157,4 +158,50 @@ public class EventController {
 
         return ResponseEntity.ok(response);
     }
+
+    // ✅ 일정 이동 요청 DTO (컨트롤러 내부 클래스)
+    public static class MoveEventRequest {
+        private String newDate; // YYYY-MM-DD 형식
+
+        public String getNewDate() {
+            return newDate;
+        }
+
+        public void setNewDate(String newDate) {
+            this.newDate = newDate;
+        }
+    }
+
+    @PatchMapping("/{id}/move")
+    public ResponseEntity<?> moveEvent(
+            @PathVariable Long id,
+            @RequestBody MoveEventRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        System.out.println("🟡 PATCH 요청 도착!"); // ★ 추가
+
+        User user = getUserFromRequest(httpRequest);
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+
+        Optional<Event> optionalEvent = eventRepository.findById(id);
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event not found");
+        }
+
+        Event event = optionalEvent.get();
+
+        if (!event.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not your event");
+        }
+
+        try {
+            LocalDate newDate = LocalDate.parse(request.getNewDate()); // 날짜 형식 검증
+            event.setDate(newDate);
+            eventRepository.save(event);
+            return ResponseEntity.ok("일정이 이동되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date format");
+        }
+    }
+
 }

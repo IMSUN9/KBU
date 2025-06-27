@@ -174,11 +174,51 @@ function showAddModal({ onSubmit, onCancel }) {
     }
   };
 
-  Calendar.prototype.drawDay = function (day) {
+  Calendar.prototype.drawDay = function (day)
+  {
     this.getWeek(day);
     const outer = createElement('div', this.getDayClass(day));
     outer.setAttribute('data-date', day.format('YYYY-MM-DD'));
     outer.addEventListener('click', () => this.openDay(outer));
+
+    // ✅ 드롭 대상이 될 수 있도록 이벤트 추가
+    outer.addEventListener('dragover', (e) => {
+      e.preventDefault(); // 드롭 허용
+    });
+
+    outer.addEventListener('drop', (e) => {
+      e.preventDefault();
+
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const targetDate = day.format('YYYY-MM-DD');
+
+        if (data.date === targetDate) return; // 동일한 날짜로 드롭 시 무시
+
+        // ✅ 서버에 업데이트 요청
+        fetch(`/api/events/${data.id}/move`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify({ newDate: targetDate })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error("서버 업데이트 실패");
+
+          // ✅ UI 갱신을 위해 새로고침
+          location.reload();
+        })
+        .catch(err => {
+          console.error("이동 실패:", err);
+          alert("일정 이동 중 오류 발생");
+        });
+      } catch (error) {
+        console.error("드롭 파싱 오류:", error);
+      }
+    });
+
 
     const name = createElement('div', 'day-name', day.format('ddd'));
     const number = createElement('div', 'day-number', day.format('DD'));
@@ -320,13 +360,26 @@ function filterEvents(events) {
       .catch(handleFetchError);
   };
 
-  Calendar.prototype.renderEvents = function (events, ele) {
+  Calendar.prototype.renderEvents = function (events, ele)
+  {
     const currentWrapper = ele.querySelector('.events');
     const wrapper = createElement('div', 'events in' + (currentWrapper ? ' new' : ''));
 
     if (events.length) {
       events.forEach(ev => {
         const div = createElement('div', 'event');
+        div.setAttribute('draggable', true); // ← 드래그 가능하게
+
+        div.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', JSON.stringify({
+            id: ev.id,
+            title: ev.eventName,
+            type: ev.calendar,
+            color: ev.color,
+            date: ev.date.format('YYYY-MM-DD')
+          }));
+        });
+
         const square = createElement('div', 'event-category ' + ev.color);
         const span = createElement('span', '', ev.eventName);
         const deleteBtn = createElement('button', 'delete-event-button', 'x');
