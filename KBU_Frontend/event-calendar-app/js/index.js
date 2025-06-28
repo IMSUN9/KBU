@@ -178,6 +178,13 @@ function showAddModal({ onSubmit, onCancel }) {
   {
     this.getWeek(day);
     const outer = createElement('div', this.getDayClass(day));
+
+    // ✅ 주말이면 weekend 클래스 추가
+    const dow = day.day();  // 0: 일요일, 6: 토요일
+    if (dow === 0 || dow === 6) {
+      outer.classList.add('weekend');
+    }
+
     outer.setAttribute('data-date', day.format('YYYY-MM-DD'));
     outer.addEventListener('click', () => this.openDay(outer));
 
