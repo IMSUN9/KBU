@@ -15,6 +15,33 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
+// ✅ 1. 명언 목록 정의
+const quotes = [
+  "성공은 실패를 거듭해도 열정을 잃지 않는 것이다. – 윈스턴 처칠",
+  "기회는 준비된 자에게 온다. – 토마스 에디슨",
+  "행동은 모든 성공의 기초이다. – 파블로 피카소",
+  "꾸준함이 곧 실력이다.",
+  "오늘 걷지 않으면 내일은 뛰어야 한다. – 도쿄대 벽 글귀",
+  "시작이 반이다. – 아리스토텔레스",
+  "지금 이 순간이 가장 중요한 순간이다.",
+];
+
+// ✅ 2. 오늘 날짜 기준으로 명언 1개 반환
+function getTodayQuote() {
+  const saved = localStorage.getItem("quoteDate");
+  const todayStr = moment().format("YYYY-MM-DD");
+
+  if (saved === todayStr) {
+    return localStorage.getItem("quoteText");
+  } else {
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    localStorage.setItem("quoteDate", todayStr);
+    localStorage.setItem("quoteText", randomQuote);
+    return randomQuote;
+  }
+}
+
+
 let showPastEvents = true;  // ✅ 추가: 지난 일정 필터링 상태
 
 function showAddModal({ onSubmit, onCancel }) {
@@ -845,6 +872,13 @@ document.getElementById("togglePastBtn").addEventListener("click", () => {
       renderUpcomingEvents(filtered);
     })
     .catch(handleFetchError);
+});
+
+// ✅ 4. 상단 quoteBox에 명언 출력
+document.addEventListener("DOMContentLoaded", () => {
+  const quote = getTodayQuote();
+  const box = document.getElementById("quoteBox");
+  if (box) box.textContent = `💬 ${quote}`;
 });
 
 

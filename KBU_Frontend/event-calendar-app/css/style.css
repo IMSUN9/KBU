@@ -983,5 +983,16 @@ body {
   color: #ff4d4d;  /* 밝은 빨간색 */
 }
 
+#quoteBox {
+  font-size: 16px;
+  color: #ffffff;         /* 더 밝은 흰색 글씨 */
+  font-weight: bold;      /* 굵게 */
+  margin-left: auto;      /* 오른쪽 정렬 */
+  margin-right: 535px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 
 
