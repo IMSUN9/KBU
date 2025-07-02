@@ -881,6 +881,39 @@ document.addEventListener("DOMContentLoaded", () => {
   if (box) box.textContent = `💬 ${quote}`;
 });
 
+// ✅ 날씨 위젯 추가
+  document.addEventListener("DOMContentLoaded", function () {
+    const apiKey = "dfcc7de5ff919e6abbf96b0d62db69f8"; // 발급받은 OpenWeatherMap API 키
+    const city = "Seoul"; // 원하는 도시
+
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=kr`)
+      .then(res => {
+        if (!res.ok) throw new Error("응답 오류");
+        return res.json();
+      })
+      .then(data => {
+        const temp = Math.round(data.main.temp); // 현재 온도
+        const description = data.weather[0].description; // 날씨 설명
+        const icon = data.weather[0].icon; // 날씨 아이콘 코드
+        const iconUrl = `https://openweathermap.org/img/wn/${icon}.png`; // 아이콘 이미지 URL
+
+        // HTML에 날씨 정보 출력
+        const weatherEl = document.getElementById("weather");
+        if (weatherEl) {
+          weatherEl.innerHTML = `
+            <img src="${iconUrl}" alt="날씨 아이콘" style="width:20px; vertical-align: middle; margin-right: 5px;" />
+            ${city} | ${temp}°C, ${description}
+          `;
+        }
+      })
+      .catch(err => {
+        console.error("❌ 날씨 불러오기 실패:", err);
+        const weatherEl = document.getElementById("weather");
+        if (weatherEl) {
+          weatherEl.innerText = "날씨 정보 없음 (API 키 대기 중)";
+        }
+      });
+  });
 
 
 

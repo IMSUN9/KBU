@@ -994,5 +994,16 @@ body {
   gap: 6px;
 }
 
+.weather-widget {
+  font-size: 1rem;
+  color: white;
+  margin-left: auto;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
 
 
