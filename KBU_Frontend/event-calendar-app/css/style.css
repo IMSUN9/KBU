@@ -585,37 +585,6 @@ body {
   color: white;
 }
 
-/* ✅ 상단바 스타일 */
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #9b59b6;
-  color: white;
-  padding: 0px 25px;
-  font-size: 15px;
-  font-weight: bold;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-/* ✅ 로그아웃 버튼 */
-#logout-btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-#logout-btn:hover {
-  background-color: #c0392b;
-}
-
 /* 🔷 일정 추가 모달 스타일 개선 */
 .add-modal {
   position: fixed;
@@ -983,27 +952,68 @@ body {
   color: #ff4d4d;  /* 밝은 빨간색 */
 }
 
-#quoteBox {
-  font-size: 16px;
-  color: #ffffff;         /* 더 밝은 흰색 글씨 */
-  font-weight: bold;      /* 굵게 */
-  margin-left: auto;      /* 오른쪽 정렬 */
-  margin-right: 535px;
+.top-bar {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-}
-
-.weather-widget {
-  font-size: 1rem;
+  background-color: #9b59b6;
   color: white;
-  margin-left: auto;
-  margin-right: 20px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  padding: 10px 25px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-size: 14px;
+  position: relative; /* 중앙 정렬용 기준 */
 }
 
+/* ✅ 왼쪽: 제목 + 날씨 */
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
+.top-left h1 {
+  font-size: 20px;
+  margin: 0;
+  font-weight: bold;
+}
 
+#weather {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+
+  /* ✅ 미세 위치 조정 */
+    position: relative;
+    top: -6px;     /* 위로 2px 이동 */
+    left: 850px;     /* 오른쪽으로 6px 이동 */
+}
+
+/* ✅ 가운데 명언 */
+#quoteBox {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+/* ✅ 로그아웃 버튼 (오른쪽) */
+#logout-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#logout-btn:hover {
+  background-color: #c0392b;
+}
 
