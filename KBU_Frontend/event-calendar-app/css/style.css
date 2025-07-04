@@ -1017,3 +1017,44 @@ body {
   background-color: #c0392b;
 }
 
+/* 🌸 파스텔톤 라이트 모드 스타일 */
+body.light-mode {
+  background-color: #fef6f0; /* 연한 살구색 배경 */
+  color: #333;
+}
+
+body.light-mode .top-bar {
+  background-color: #f9c74f; /* 파스텔 노랑 */
+  color: #333;
+}
+
+body.light-mode .day {
+  background-color: #fffaf5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+body.light-mode .details {
+  background-color: #fcefe3;
+  color: #333;
+}
+
+body.light-mode .legend span {
+  filter: brightness(1.05);
+}
+
+body.light-mode .modal-content {
+  background-color: #fffaf0;
+  color: #333;
+}
+
+body.light-mode .detail-modal {
+  background-color: rgba(255, 245, 230, 0.9);
+}
+
+body.light-mode .weather-widget {
+  color: #333;
+}
+
+
+

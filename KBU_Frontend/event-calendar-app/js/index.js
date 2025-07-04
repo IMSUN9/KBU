@@ -915,6 +915,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    document.body.classList.toggle('light-mode');
+
+    // 아이콘도 바꿔주기
+    const isLight = document.body.classList.contains('light-mode');
+    this.textContent = isLight ? '🌙' : '🌞';
+  });
+
+
 
 
 }();
