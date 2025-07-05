@@ -1056,5 +1056,46 @@ body.light-mode .weather-widget {
   color: #333;
 }
 
+/* 🌞 라이트 모드에서 테마 전환 버튼 위치 미세조정 */
+body.light-mode #theme-toggle {
+  position: relative;
+  left: 120px;  /* 👉 명언 오른쪽으로 띄우기 */
+  top: 0px;
+}
+
+body:not(.light-mode) #theme-toggle {
+  position: relative;
+  left: 120px;
+  top: 0px;
+}
+
+#goTodayBtn {
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 10px;
+  transition: background-color 0.2s ease;
+}
+
+#goTodayBtn:hover {
+  background-color: #4834d4;
+}
+
+.highlight-today {
+  animation: blink 0.4s ease-in-out 4;
+  border: 2px solid #ff7675;
+  border-radius: 8px;
+}
+
+@keyframes blink {
+  0%, 100% { background-color: #ffeaa7; }
+  50% { background-color: #fab1a0; }
+}
+
+
 
 

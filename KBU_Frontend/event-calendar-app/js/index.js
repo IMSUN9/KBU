@@ -533,6 +533,8 @@ function filterEvents(events) {
     }
   }
 
+let calendarInstance = null;  // 전역에서 접근 가능하도록 선언
+
   fetch('http://localhost:8080/api/events', {
     method: 'GET',
     headers: {
@@ -555,7 +557,8 @@ function filterEvents(events) {
       }));
 
       const filtered = filterEvents(events);  // ✅ 필터 적용
-      new Calendar('#calendar', filtered);    // ✅ 필터링된 일정으로 캘린더 렌더링
+
+      calendarInstance = new Calendar('#calendar', filtered); // ← 전역 변수에 저장
       renderUpcomingEvents(filtered);         // ✅ 다가오는 일정도 필터된 데이터 사용
     })
     .catch(handleFetchError);
@@ -922,6 +925,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const isLight = document.body.classList.contains('light-mode');
     this.textContent = isLight ? '🌙' : '🌞';
   });
+
+document.getElementById('goTodayBtn').addEventListener('click', () => {
+  if (!calendarInstance) return;
+  calendarInstance.current = moment().date(1); // 현재 월의 첫 날로 이동
+  calendarInstance.draw();  // 다시 그리기
+
+  // 오늘 날짜 셀 하이라이트
+  const todayStr = moment().format("YYYY-MM-DD");
+  const todayCell = document.querySelector(`[data-date="${todayStr}"]`);
+  if (todayCell) {
+    todayCell.classList.add('highlight-today');
+    setTimeout(() => todayCell.classList.remove('highlight-today'), 2000);
+  }
+});
+
 
 
 
