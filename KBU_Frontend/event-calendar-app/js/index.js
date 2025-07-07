@@ -41,8 +41,11 @@ function getTodayQuote() {
   }
 }
 
+let allEvents = [];  // 전역 선언
 
 let showPastEvents = true;  // ✅ 추가: 지난 일정 필터링 상태
+
+
 
 function showAddModal({ onSubmit, onCancel }) {
     const modal = document.createElement('div');
@@ -547,6 +550,8 @@ let calendarInstance = null;  // 전역에서 접근 가능하도록 선언
       return res.json();
     })
     .then(eventList => {
+      allEvents = eventList; // ✅ 원본 데이터를 전역에 저장 (검색용)
+
       const events = eventList.map(ev => ({
         id: ev.id,                // ✅ 이 줄 꼭 추가
         eventName: ev.title,
@@ -939,6 +944,55 @@ document.getElementById('goTodayBtn').addEventListener('click', () => {
     setTimeout(() => todayCell.classList.remove('highlight-today'), 2000);
   }
 });
+
+document.getElementById('searchInput').addEventListener('input', function (e) {
+  const keyword = e.target.value.trim().toLowerCase();
+  const resultsContainer = document.getElementById('searchResults');
+
+  if (!keyword) {
+    resultsContainer.innerHTML = '';
+    clearSearchHighlights();
+    return;
+  }
+
+  // ✅ 검색
+  const matchedEvents = allEvents.filter(event =>
+    event.title.toLowerCase().includes(keyword)
+  );
+
+  // ✅ 날짜 모아 강조
+  const matchedDates = matchedEvents.map(event => event.date); // ['2025-07-04', '2025-07-10', ...]
+  highlightDates(matchedDates);
+
+  // ✅ 결과 출력
+  if (matchedEvents.length > 0) {
+    resultsContainer.innerHTML = matchedEvents
+      .map(event => `📌 <strong>${event.title}</strong> - ${event.date}`)
+      .join('<br>');
+  } else {
+    resultsContainer.innerHTML = '🔍 일치하는 일정이 없습니다.';
+  }
+});
+
+
+// ✅ 기존 하이라이트 제거
+function clearSearchHighlights() {
+  document.querySelectorAll('.day').forEach(dayEl => {
+    dayEl.classList.remove('search-highlight');
+  });
+}
+
+// ✅ 검색된 날짜를 강조
+function highlightDates(dates) {
+  clearSearchHighlights();
+
+  dates.forEach(dateStr => {
+    const cell = document.querySelector(`.day[data-date="${dateStr}"]`);
+    if (cell) {
+      cell.classList.add('search-highlight');
+    }
+  });
+}
 
 
 

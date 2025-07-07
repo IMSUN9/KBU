@@ -20,26 +20,36 @@
 
 <!-- ✅ 상단 바 -->
 <div class="top-bar">
-
     <div class="top-left">
         <h1>📅 나의 일정 관리</h1>
 
         <!-- ✅ 오늘로 이동 버튼 -->
         <button id="goTodayBtn">📆 오늘로 가기</button>
 
-        <!-- ✅ 날씨 위젯 (id는 하나만!) -->
+        <!-- ✅ 날씨 위젯 -->
         <div id="weather" class="weather-widget" style="margin-top: 10px; color: white;">
             ⛅ 날씨 로딩 중...
         </div>
     </div>
 
-    <!-- ✅ 명언 출력 영역 -->
+    <!-- ✅ 명언 출력 -->
     <div id="quoteBox" class="quote-box"></div>
 
+    <!-- ✅ 테마 전환 -->
     <button id="theme-toggle">🌞</button>
 
+    <!-- ✅ 로그아웃 -->
     <button id="logout-btn">로그아웃</button>
+</div>
 
+<!-- ✅ 🔍 왼쪽 고정형 일정 검색 박스 -->
+<div class="search-box">
+    <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 일정 검색 (예: 운동, 회의)"
+    />
+    <div id="searchResults"></div>
 </div>
 
 <!-- ✅ 통계 보기 버튼 -->
@@ -68,7 +78,6 @@
 <div class="filter-toggle-wrapper">
     <button id="togglePastBtn">👁️ 지난 일정 숨기기</button>
 </div>
-
 
 <!-- ✅ 일정 상세 보기 모달 -->
 <div id="detailModal" class="detail-modal" style="display: none;">

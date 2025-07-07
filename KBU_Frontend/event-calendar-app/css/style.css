@@ -1096,6 +1096,55 @@ body:not(.light-mode) #theme-toggle {
   50% { background-color: #fab1a0; }
 }
 
+/* ✅ 왼쪽 고정형 일정 검색 박스 */
+.search-box {
+  position: absolute;
+  top: 360px;
+  left: 210px;
+  width: 250px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  color: #333;
+}
+
+/* 검색창 input 스타일 */
+#searchInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+/* 검색 결과 영역 */
+#searchResults {
+  max-height: 300px;
+  overflow-y: auto;
+  font-size: 14px;
+  color: #333;
+}
+
+#searchResults div {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+#searchResults div:hover {
+  background-color: #f1f1f1;
+}
+
+/* 🔍 검색된 날짜 강조 스타일 */
+.search-highlight {
+  border: 2px solid #ffd700 !important; /* 진한 금색 테두리 */
+  box-shadow: 0 0 10px #ffd700;
+  border-radius: 8px;
+}
+
 
 
 
