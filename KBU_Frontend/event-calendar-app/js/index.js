@@ -61,6 +61,7 @@ function showAddModal({ onSubmit, onCancel }) {
           <option value="Friend">Friend</option>
           <option value="Other">Other</option>
         </select>
+        <textarea id="event-description" placeholder="일정 설명 (선택)"></textarea>
         <div class="modal-actions">
           <button id="submit-event">추가</button>
           <button id="cancel-event">취소</button>
@@ -73,8 +74,10 @@ function showAddModal({ onSubmit, onCancel }) {
     document.getElementById('submit-event').onclick = () => {
       const title = document.getElementById('event-title').value.trim();
       const type = document.getElementById('event-type').value;
+      const description = document.getElementById('event-desc').value.trim();  // ✅ 설명 읽기
+
       if (title) {
-        onSubmit(title, type);
+        onSubmit(title, type, description);  // ✅ description 전달
         modal.remove();
       }
     };
