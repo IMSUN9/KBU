@@ -1,7 +1,6 @@
 package com.example.calendar.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -31,6 +30,10 @@ public class Event {
     // ✅ 일정 완료 여부 (기본값: false)
     @Column(nullable = false)
     private boolean completed = false;
+
+    // ✅ 일정 설명 (선택 입력 가능)
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     // ✅ 연관 사용자 정보 (ManyToOne)
     @ManyToOne
@@ -94,5 +97,12 @@ public class Event {
     }
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

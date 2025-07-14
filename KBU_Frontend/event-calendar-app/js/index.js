@@ -74,7 +74,7 @@ function showAddModal({ onSubmit, onCancel }) {
     document.getElementById('submit-event').onclick = () => {
       const title = document.getElementById('event-title').value.trim();
       const type = document.getElementById('event-type').value;
-      const description = document.getElementById('event-desc').value.trim();  // ✅ 설명 읽기
+      const description = document.getElementById('eventDescription').value.trim();  // ✅ 수정된 ID로 변경
 
       if (title) {
         onSubmit(title, type, description);  // ✅ description 전달
@@ -326,7 +326,7 @@ Calendar.prototype.openDay = function (el) {
     const addEventBtn = createElement('button', 'add-event-button', 'Add Event');
     addEventBtn.addEventListener('click', () => {
       showAddModal({
-        onSubmit: (title, type) => this.addEvent(title, type, day, details),
+        onSubmit: (title, type, description) => this.addEvent(title, type, description, day, details),
         onCancel: () => {}
       });
     });
@@ -366,8 +366,13 @@ function filterEvents(events) {
 
 
 
-  Calendar.prototype.addEvent = function (title, type, day, details) {
-    const newEvent = { title, type, date: day.format('YYYY-MM-DD') };
+  Calendar.prototype.addEvent = function (title, type, description, day, details) {
+    const newEvent = {
+    title,
+    type,
+    description, // ← 새로 추가한 설명 필드
+    date: day.format('YYYY-MM-DD')
+     };
 
     fetch('http://localhost:8080/api/events', {
       method: 'POST',
@@ -773,40 +778,48 @@ function openDetailModal(events) {
   list.innerHTML = '';
 
   events.forEach(ev => {
-    // ✅ 여기에서 로그 출력해서 ev 객체 상태 확인
     console.log("📌 이벤트 객체:", ev);
     console.log("📌 이벤트 ID:", ev.id);
 
     const li = document.createElement('li');
-    li.dataset.eventId = ev.id;  // 여기! 이벤트 ID 저장
+    li.dataset.eventId = ev.id;
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = `chk-${ev.eventName}-${ev.date.format('YYYYMMDD')}`;
 
-    // ✅ 기존에 완료된 일정이라면 체크 + 취소선 추가
     if (ev.completed) {
       checkbox.checked = true;
       li.classList.add('completed');
     }
 
-    const label = document.createElement('label');
-    label.textContent = ev.eventName;
-    label.setAttribute('for', checkbox.id);
+    // ✅ 제목 span
+    const title = document.createElement('span');
+    title.textContent = ev.eventName;
+    title.className = 'event-title';
 
-    // ✅ 체크박스 클릭 시 완료 스타일 토글 + 서버에 상태 전송
+    // ✅ 설명 div
+    const desc = document.createElement('div');
+    desc.textContent = ev.description || '';
+    desc.className = 'event-description';
+
+    // ✅ 라벨 구성
+    const label = document.createElement('label');
+    label.setAttribute('for', checkbox.id);
+    label.appendChild(title);
+    if (desc.textContent) label.appendChild(desc);
+
+    // ✅ 체크박스 이벤트 핸들러
     checkbox.addEventListener('change', () => {
-      const eventId = li.dataset.eventId;  // ← 여기에서 ID 안전하게 가져옴
+      const eventId = li.dataset.eventId;
       const completed = checkbox.checked;
 
-      // ✅ 스타일 업데이트
       if (completed) {
         li.classList.add('completed');
       } else {
         li.classList.remove('completed');
       }
 
-      // ✅ 서버에 완료 상태 전송
       fetch(`/api/events/${eventId}/complete`, {
         method: 'POST',
         headers: {
@@ -820,7 +833,6 @@ function openDetailModal(events) {
         })
         .catch(error => {
           alert("⚠️ 상태 업데이트 실패");
-          // 실패 시 상태 복원
           checkbox.checked = !completed;
           if (checkbox.checked) {
             li.classList.add('completed');

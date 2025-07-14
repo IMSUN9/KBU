@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.calendar.dto.EventRequest;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -41,15 +43,19 @@ public class EventController {
         return null;
     }
 
-    // ✅ 일정 추가
     @PostMapping
-    public Event addEvent(@RequestBody Event event, HttpServletRequest request) {
+    public Event addEvent(@RequestBody EventRequest eventRequest, HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        if (user != null) {
-            event.setUser(user);
-            return eventRepository.save(event);
-        }
-        return null;
+        if (user == null) return null;
+
+        Event event = new Event();
+        event.setTitle(eventRequest.title);
+        event.setType(eventRequest.type);
+        event.setDate(LocalDate.parse(eventRequest.date));
+        event.setDescription(eventRequest.description);  // ✅ 설명 필드 매핑
+        event.setUser(user);
+
+        return eventRepository.save(event);
     }
 
     // ✅ 일정 삭제 (제목, 유형, 날짜 기준)
