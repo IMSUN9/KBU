@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.calendar.dto.EventRequest;
+import com.example.calendar.dto.EventDto; // 추가
 
 
 import java.time.LocalDate;
@@ -81,15 +82,27 @@ public class EventController {
         return false;
     }
 
-    // ✅ 전체 일정 조회
     @GetMapping
-    public List<Event> getAllEvents(HttpServletRequest request) {
+    public List<EventDto> getAllEvents(HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        if (user != null) {
-            return eventRepository.findByUser(user);
+        if (user == null) {
+            return List.of();
         }
-        return List.of();
+
+        List<Event> events = eventRepository.findByUser(user);
+
+        return events.stream()
+                .map(ev -> new EventDto(
+                        ev.getId(),
+                        ev.getTitle(),
+                        ev.getType(),
+                        ev.getDate(),
+                        ev.isCompleted(),
+                        ev.getDescription() // ✅ 설명 포함
+                ))
+                .toList();
     }
+
 
     // ✅ 일정 완료 상태 업데이트 (체크박스)
     @PostMapping("/{id}/complete")

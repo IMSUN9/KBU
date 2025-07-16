@@ -1146,12 +1146,18 @@ body:not(.light-mode) #theme-toggle {
 }
 
 .event-description {
+  display: block;
   font-size: 0.85em;
   color: #666;
   margin-left: 8px;
-  display: block;
+  white-space: pre-wrap;
 }
 
+.event-label-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
 
 

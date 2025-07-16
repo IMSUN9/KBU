@@ -374,7 +374,8 @@ function filterEvents(events) {
     date: day.format('YYYY-MM-DD')
      };
 
-    fetch('http://localhost:8080/api/events', {
+    fetch('http://localhost:8080/api/events',
+    {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -388,7 +389,8 @@ function filterEvents(events) {
           eventName: addedEvent.title,
           calendar: addedEvent.type,
           color: getColor(addedEvent.type),
-          date: moment(addedEvent.date, 'YYYY-MM-DD')
+          date: moment(addedEvent.date, 'YYYY-MM-DD'),
+          description: addedEvent.description // ✅ 설명 추가!
         });
 
         this.renderEvents(this.events.filter(ev => ev.date.isSame(day, 'day')), details);
@@ -566,7 +568,8 @@ let calendarInstance = null;  // 전역에서 접근 가능하도록 선언
         calendar: ev.type,
         color: getColor(ev.type),
         date: moment(ev.date, 'YYYY-MM-DD'),
-        completed: ev.completed // 이 값도 detail 모달에서 필요
+        completed: ev.completed, // 이 값도 detail 모달에서 필요
+        description: ev.description || '' // ✅ 요거 추가!
       }));
 
       const filtered = filterEvents(events);  // ✅ 필터 적용
@@ -800,14 +803,22 @@ function openDetailModal(events) {
 
     // ✅ 설명 div
     const desc = document.createElement('div');
+    console.log("📌 설명:", ev.description);
     desc.textContent = ev.description || '';
     desc.className = 'event-description';
 
-    // ✅ 라벨 구성
-    const label = document.createElement('label');
-    label.setAttribute('for', checkbox.id);
-    label.appendChild(title);
-    if (desc.textContent) label.appendChild(desc);
+   // ✅ 라벨 안에 감쌀 wrapper 생성
+   const wrapper = document.createElement('div');
+   wrapper.className = 'event-label-wrapper'; // 필요 시 CSS로 스타일 줄 수 있음
+
+   wrapper.appendChild(title);
+   if (desc.textContent) wrapper.appendChild(desc);
+
+   // ✅ 라벨 구성 (wrapper 사용)
+   const label = document.createElement('label');
+   label.setAttribute('for', checkbox.id);
+   label.appendChild(wrapper);
+
 
     // ✅ 체크박스 이벤트 핸들러
     checkbox.addEventListener('change', () => {
@@ -881,7 +892,8 @@ document.getElementById("togglePastBtn").addEventListener("click", () => {
         calendar: ev.type,
         color: getColor(ev.type),
         date: moment(ev.date, 'YYYY-MM-DD'),
-        completed: ev.completed
+        completed: ev.completed,
+        description: ev.description || '' // ✅ 요거 추가!
       }));
 
       const filtered = filterEvents(events);  // ✅ 지난 일정 필터링 적용
