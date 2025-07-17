@@ -74,7 +74,7 @@ function showAddModal({ onSubmit, onCancel }) {
     document.getElementById('submit-event').onclick = () => {
       const title = document.getElementById('event-title').value.trim();
       const type = document.getElementById('event-type').value;
-      const description = document.getElementById('eventDescription').value.trim();  // ✅ 수정된 ID로 변경
+      const description = document.getElementById('event-description').value.trim();
 
       if (title) {
         onSubmit(title, type, description);  // ✅ description 전달
